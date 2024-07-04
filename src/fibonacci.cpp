@@ -28,7 +28,7 @@ T fibTailRec(T n, T a = 0, T b = 1) {
 
 /** 
  * Iterative implementation.
- * This is a dynamic programming approach called tabulation.
+ * This uses a dynamic programming approach called tabulation.
  * We proceed bottom-up storing the result of each subproblem.
  */
 template <integral T>
