@@ -7,15 +7,17 @@ using namespace std;
  * This is tail recursive.
  * We use a helper function that receives a pre-processed input.
  */
-template <PalindromicContainer T>
-bool isPalindromeRecHelper(const T& container, int beg, int end) {
+template <PalindromicContainer T, integral Q>
+bool isPalindromeRecHelper(const T& container, Q beg, Q end) {
     if (beg >= end) return true;
     if (container[beg] != container[end]) return false;
     return isPalindromeRecHelper(container, beg+1, end-1); 
 }
 template <PalindromicContainer T>
 bool isPalindromeRec(const T& container) {
-    return isPalindromeRecHelper(container, 0, container.size()-1);
+    integral auto end = container.size() - 1;
+    decltype(end) beg = 0;
+    return isPalindromeRecHelper(container, beg, end);
 }
 
 /**
