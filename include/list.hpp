@@ -1,4 +1,7 @@
-using namespace std;
+#ifndef LIST_H
+#define LIST_H
+
+namespace alg {
 
 /**
  * Node of a singly linked list with value of generic type.
@@ -53,4 +56,8 @@ SListNode<T>* findCycle(SListNode<T>* head) {
     while(slow != fast) { slow = slow->next; fast = fast->next; }
     return slow;
 }
+
+}
+
+#endif // !LIST_H
 
