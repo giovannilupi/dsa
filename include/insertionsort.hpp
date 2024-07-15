@@ -1,6 +1,9 @@
+#ifndef INSERTIONSORT_H
+#define INSERTIONSORT_H
+
 #include "alg_concepts.hpp"
 
-using namespace std;
+namespace alg {
 
 /**
  * Generic implementation of the classic insertion sort algorithm.
@@ -10,7 +13,7 @@ void insertionSort(T& container) {
     for (int i = 1; i < container.size(); ++i) {
         // We go backwards looking for the insert position
         for (int j = i; j && container[j-1] > container[j]; --j) {
-            swap(container[j-1], container[j]);
+            std::swap(container[j-1], container[j]);
         }
     }
 }
@@ -25,4 +28,8 @@ void insertionSortModern(T& container) {
     for (auto it = itb; it != ite; ++it)
         rotate(upper_bound(itb, it, *it), it, next(it));
 }
+
+}
+
+#endif // !INSERTIONSORT_H
 

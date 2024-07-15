@@ -1,8 +1,10 @@
+#ifndef SELECTIONSORT_H
+#define SELECTIONSORT_H
+
 #include <climits>
-#include <utility>
 #include "alg_concepts.hpp"
 
-using namespace std;
+namespace alg {
 
 /**
  * Generic implementation of the classic selection sort algorithm.
@@ -16,7 +18,11 @@ void selectionSort(T& container) {
         for (SzType j = i+1; j < sz; ++j) {
             if (container[j] < container[minidx]) minidx = j;
         }
-        swap(container[i], container[minidx]);
+        std::swap(container[i], container[minidx]);
     }
 }
+
+}
+
+#endif // !SELECTIONSORT_H
 
