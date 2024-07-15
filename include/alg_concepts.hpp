@@ -5,6 +5,8 @@
 #include <iostream>
 #include <ranges>
 
+namespace alg {
+
 /**
  * Sortable container type.
  * A container is sortable if it's a sequence with a sortable iterator type.
@@ -48,5 +50,7 @@ concept PalindromicContainer =
     std::ranges::sized_range<T> && 
     // The value type must be equality comparable
     std::equality_comparable<std::ranges::range_value_t<T>>;
+
+}
 
 #endif // ALG_CONCEPTS_H
