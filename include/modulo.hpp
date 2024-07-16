@@ -1,6 +1,7 @@
-#include <concepts>
+#ifndef MODULO_H
+#define MODULO_H
 
-using namespace std;
+#include <concepts>
 
 /**
  * Computes a mod m.
@@ -9,8 +10,11 @@ using namespace std;
  * the sign of the result is implementation-defined.
  * To enforce the mathematical definition, we can force the result to be positive. 
  */
-template <integral T>
+template <std::integral T>
 T mod(T a, T m) {
     T r = a % m;
     return (r < 0) ? (r + m) : r;
 }
+
+#endif // !MODULO_H
+

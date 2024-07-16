@@ -1,6 +1,7 @@
 #ifndef ALG_CONCEPTS_H
 #define ALG_CONCEPTS_H
 
+#include <__ranges/concepts.h>
 #include <iterator>
 #include <iostream>
 #include <ranges>
@@ -50,6 +51,16 @@ concept PalindromicContainer =
     std::ranges::sized_range<T> && 
     // The value type must be equality comparable
     std::equality_comparable<std::ranges::range_value_t<T>>;
+
+/**
+ * A matrix type.
+ */
+template <typename T>
+concept Matrix =
+    // Must provide random access to elements
+    std::ranges::random_access_range<T> && 
+    // Must contain a random access container
+    std::ranges::random_access_range<typename T::value_type>;  
 
 }
 
