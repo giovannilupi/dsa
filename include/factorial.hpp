@@ -7,12 +7,23 @@
 
 namespace alg {
 
+namespace detail {
+
+/**
+ * Helper function for tail recursive implementation of factorial.
+ */
+inline uint64_t factTailRecHelper(uint64_t n, uint64_t accum) {
+    if (n == 0 || n == 1) return accum;
+    return factTailRecHelper(n-1, n * accum);
+}
+
+}
+
 /**
  * Naive recursive implementation.
  * The size of the call stack grows linearly with the size of n. 
  */
-template <std::unsigned_integral T>
-uint64_t factRec(T n) {
+inline uint64_t factRec(uint64_t n) {
     if (n == 0 || n == 1) return 1;
     return n * factRec(n-1);
 }
@@ -21,17 +32,14 @@ uint64_t factRec(T n) {
  * Tail recursive implementation.
  * This uses a second parameter to accumulate the factorial value.
  */
-template <std::unsigned_integral T>
-uint64_t factRecTail(T n, T accum = 1) {
-    if (n == 0 || n == 1) return accum;
-    return factRecTail(n-1, n * accum);
+inline uint64_t factTailRec(uint64_t n) {
+    return detail::factTailRecHelper(n, 1);
 }
 
 /**
  * Iterative implementation.
  */ 
-template <std::unsigned_integral T>
-uint64_t factIter(T n) {
+inline uint64_t factIter(uint64_t n) {
     uint64_t res = 1;
     while(n) res *= n--;
     return res;

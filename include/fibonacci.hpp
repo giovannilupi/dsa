@@ -1,14 +1,31 @@
+#ifndef FIBONACCI_H
+#define FIBONACCI_H
+
 #include <concepts>
 
-using namespace std;
+namespace alg {
+
+namespace detail {
+
+/**
+ * Helper function for tail recursive implementation of fibonacci sequence.
+ */
+inline uint64_t fibTailRec(uint64_t n, uint64_t a = 0, uint64_t b = 1) {
+    if (n == 0) return a;
+    if (n == 1) return b;
+    // b becomes the previous number in the sequence
+    return fibTailRec(n-1, b, a+b); 
+}
+
+}
+
 
 /**
  * Naive recursive implementation.
  * The number of recursive calls grows exponentially with n.
  * This apporach becomes quickly unpractical even for a relatively small n.
  */ 
-template <integral T>
-T fibRec(T n) {
+inline uint64_t fibRec(uint64_t n) {
     if (n == 0 || n == 1) return n;
     return fibRec(n-1) + fibRec(n-2);
 }
@@ -18,12 +35,8 @@ T fibRec(T n) {
  * The extra parameters form a size two window over the sequence.
  * The function computes the next number in the sequence and shifts the window by one at every iteration.
  */
-template <integral T>
-T fibTailRec(T n, T a = 0, T b = 1) {
-    if (n == 0) return a;
-    if (n == 1) return b;
-    // b becomes the previous number in the sequence
-    return fibTailRec(n-1, b, a+b); 
+inline uint64_t fibTailRec(uint64_t n) {
+    return detail::fibTailRec(n);
 }
 
 /** 
@@ -31,15 +44,18 @@ T fibTailRec(T n, T a = 0, T b = 1) {
  * This uses a dynamic programming approach called tabulation.
  * We proceed bottom-up storing the result of each subproblem.
  */
-template <integral T>
-T fibIter(T n) {
+inline uint64_t fibIter(uint64_t n) {
     if (n == 0 || n == 1) return n;
-    T prev = 0, curr = 1;
-    for (T i = 2; i != n; ++i)  {
+    uint64_t prev = 0, curr = 1;
+    for (uint64_t i = 2; i <= n; ++i)  {
+        uint64_t temp = curr;
         curr += prev;
-        // prev becomes what was in curr before its increment
-        prev ^= curr;
+        prev = temp;
     }
     return curr;
 }
+
+}
+
+#endif // !FIBONACCI_H
 
