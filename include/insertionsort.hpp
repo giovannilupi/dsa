@@ -1,5 +1,4 @@
-#ifndef INSERTIONSORT_H
-#define INSERTIONSORT_H
+#pragma once
 
 #include "alg_concepts.hpp"
 #include <concepts>
@@ -44,6 +43,3 @@ void insertionSortModern(T& container) {
 }
 
 }
-
-#endif // !INSERTIONSORT_H
-

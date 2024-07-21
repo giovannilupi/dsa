@@ -1,5 +1,4 @@
-#ifndef PALINDROME_H 
-#define PALINDROME_H
+#pragma once
 
 #include "alg_concepts.hpp"
 #include <algorithm>
@@ -40,6 +39,3 @@ bool isPalindromeIter(const T& container) {
 }
 
 }
-
-#endif // PALINDROME_H
-

@@ -1,5 +1,4 @@
-#ifndef HEAP_HPP
-#define HEAP_HPP
+#pragma once
 
 #include <__concepts/relation.h>
 #include <functional>
@@ -56,8 +55,9 @@ public:
      * Complexity: O(log n)
      */
     void insert(const T& value) { 
-        vec.push_back(value); 
-        heapifyIter(vec.size()-1); 
+        vec.push_back(value);
+        int p = parent(vec.size()-1);
+        if (p >=0) heapifyIter(p); 
     }
 
     /**
@@ -113,7 +113,7 @@ public:
         return os;
     }
 
-protected:
+private:
     /** The heap is implemented as vector, operations are performed with arithmetics on indices. */
     std::vector<T> vec;
     /** Comparison function for the heap type. */
@@ -211,5 +211,3 @@ template <typename T>
 using MinHeap = detail::Heap<T, MinHeapCmp<T>>;
 
 }
-
-#endif // !HEAP_HPP

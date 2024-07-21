@@ -1,5 +1,4 @@
-#ifndef STRASSEN_H
-#define STRASSEN_H
+#pragma once
 
 #include "alg_concepts.hpp"
 
@@ -207,5 +206,3 @@ void matrixMultStrassen(const T &a, const T &b, T &c) {
 }
 
 }
-
-#endif

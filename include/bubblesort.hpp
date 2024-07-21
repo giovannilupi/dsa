@@ -1,5 +1,4 @@
-#ifndef BUBBLESORT_H
-#define BUBBLESORT_H
+#pragma once
 
 #include "alg_concepts.hpp"
 
@@ -29,6 +28,3 @@ void bubbleSort(T& container) {
 }
 
 }
-
-#endif // !BUBBLESORT_H
-

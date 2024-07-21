@@ -1,5 +1,4 @@
-#ifndef POWER_H
-#define POWER_H
+#pragma once
 
 #include <concepts>
 #include <cstdint>
@@ -91,5 +90,3 @@ int64_t powSquaringTailRec(T base, uint8_t exp) {
 }
 
 }
-
-#endif // !POWER_H

@@ -1,5 +1,4 @@
-#ifndef FIBONACCI_H
-#define FIBONACCI_H
+#pragma once
 
 #include <concepts>
 
@@ -56,6 +55,3 @@ inline uint64_t fibIter(uint64_t n) {
 }
 
 }
-
-#endif // !FIBONACCI_H
-

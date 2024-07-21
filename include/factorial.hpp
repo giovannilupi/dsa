@@ -1,5 +1,4 @@
-#ifndef FACTORIAL_H
-#define FACTORIAL_H
+#pragma once
 
 #include <__concepts/arithmetic.h>
 #include <concepts>
@@ -46,6 +45,3 @@ inline uint64_t factIter(uint64_t n) {
 } 
 
 }
-
-#endif // !FACTORIAL_H
-

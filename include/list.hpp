@@ -1,5 +1,4 @@
-#ifndef LIST_H
-#define LIST_H
+#pragma once
 
 namespace alg {
 
@@ -58,6 +57,3 @@ SListNode<T>* findCycle(SListNode<T>* head) {
 }
 
 }
-
-#endif // !LIST_H
-

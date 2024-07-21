@@ -1,5 +1,4 @@
-#ifndef BINARYSEARCH_H
-#define BINARYSEARCH_H
+#pragma once
 
 #include "alg_concepts.hpp"
 #include <concepts>
@@ -72,6 +71,3 @@ T bSearchLibIt (T first, T last, const typename T::value_type& val) {
 }
 
 }
-
-#endif // !BINARYSEARCH_H
-

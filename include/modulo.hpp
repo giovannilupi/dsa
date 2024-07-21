@@ -1,5 +1,4 @@
-#ifndef MODULO_H
-#define MODULO_H
+#pragma once
 
 #include <concepts>
 
@@ -15,6 +14,3 @@ T mod(T a, T m) {
     T r = a % m;
     return (r < 0) ? (r + m) : r;
 }
-
-#endif // !MODULO_H
-

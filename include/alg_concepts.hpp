@@ -1,5 +1,4 @@
-#ifndef ALG_CONCEPTS_H
-#define ALG_CONCEPTS_H
+#pragma once
 
 #include <__ranges/concepts.h>
 #include <iterator>
@@ -63,5 +62,3 @@ concept Matrix =
     std::ranges::random_access_range<typename T::value_type>;  
 
 }
-
-#endif // ALG_CONCEPTS_H

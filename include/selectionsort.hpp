@@ -1,5 +1,4 @@
-#ifndef SELECTIONSORT_H
-#define SELECTIONSORT_H
+#pragma once
 
 #include <climits>
 #include "alg_concepts.hpp"
@@ -23,6 +22,3 @@ void selectionSort(T& container) {
 }
 
 }
-
-#endif // !SELECTIONSORT_H
-

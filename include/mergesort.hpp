@@ -1,5 +1,4 @@
-#ifndef MERGESORT_H
-#define MERGESORT_H
+#pragma once
 
 #include "alg_concepts.hpp"
 #include "insertionsort.hpp"
@@ -91,6 +90,3 @@ void mergeSortCoarse(T& container) {
 }
 
 }
-
-#endif // !MERGESORT_H
-
