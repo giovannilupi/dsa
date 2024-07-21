@@ -56,14 +56,38 @@ public:
      */
     void insert(const T& value) { 
         vec.push_back(value);
-        int p = parent(vec.size()-1);
-        if (p >=0) heapifyIter(p); 
+        heapifyUpIter(vec.size() - 1);
     }
 
     /**
-     * Returns the root of the heap.
+     * Removes the root of the heap and returns it.
+     * The behavior is undefined if the heap is empty.
+     * Complexity: O(log n)
      */
-    const T& root() const { return vec.front(); } 
+    T extract() {
+        T result = peek();
+        vec.front() = vec.back();
+        vec.pop_back();
+        heapifyDownIter(0);
+        return result;
+    }
+
+    /**
+     * Removes the root of the heap.
+     * The behavior is undefined if the heap is empty.
+     * Complexity: O(log n)
+     */
+    void remove() { 
+        vec.front() = vec.back();
+        vec.pop_back();
+        heapifyDownIter(0);
+     }
+
+    /**
+     * Returns the root of the heap.
+     * The behavior is undefined if the heap is empty.
+     */
+    const T& peek() const { return vec.front(); } 
 
     /**
      * Returns true if the heap is empty.
@@ -124,14 +148,15 @@ private:
      * Complexity: O(n)
      */
     void buildHeap() {
-        for (int i = (vec.size() / 2) - 1; i >= 0; --i) heapifyIter(i);
+        for (int i = (vec.size() / 2) - 1; i >= 0; --i) heapifyDownIter(i);
     }
 
     /**
-     * Recursive implementation of the heapify procedure.
+     * Recursive implementation of the heapify down procedure.
+     * This floats elements down the heap to maintain the heap property.
      * Complexity: O(log n)
      */
-    void heapifyRec(int idx) {
+    void heapifyDownRec(int idx) {
         int lt = left(idx);
         int rt = right(idx);
         int sz = size();
@@ -142,15 +167,16 @@ private:
         // If largest is not the current node, swap and recurse
         if (largest != idx) {
             std::swap(vec[idx], vec[largest]);
-            heapifyRec(largest);
+            heapifyDownRec(largest);
         }
     }
 
     /**
-     * Iterative implementation of the heapify procedure.
+     * Iterative implementation of the heapify down procedure.
+     * This floats elements down the heap to maintain the heap property.
      */
-    void heapifyIter(int idx) {
-        int sz = this->size();
+    void heapifyDownIter(int idx) {
+        int sz = vec.size();
         while (true) {
             int largest = idx;
             int lt = left(largest);
@@ -163,6 +189,35 @@ private:
             // Otherwise, swap and continue
             std::swap(vec[idx], vec[largest]);
             idx = largest;
+        }
+    }
+
+    /**
+     * Iterative implementation of the heapify up procedure.
+     * This floats elements up the heap to maintain the heap property.
+     */
+    void heapifyUpIter(int idx) {
+        while (idx > 0) {
+            int p = parent(idx);
+            if (cmp(vec[idx], vec[p])) { 
+                std::swap(vec[idx], vec[p]); 
+                idx = p; 
+            }
+            else break;
+        }
+    }
+
+    /**
+     * Recursive implementation of the heapify up procedure.
+     * This floats elements up the heap to maintain the heap property.
+     */
+    void heapifyUpRec(int idx) {
+        if (idx > 0) {
+            int p = parent(idx);
+            if (cmp(vec[idx], vec[p])) {
+                std::swap(vec[idx], vec[p]);
+                heapifyUpRec(p);
+            }
         }
     }
 
