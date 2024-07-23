@@ -1,10 +1,7 @@
 #pragma once
 
-
-
 #include "alg_concepts.hpp"
 #include "heap.hpp"
-
 
 namespace alg {
 
@@ -20,9 +17,8 @@ namespace alg {
 template <SortableContainer T>
 void heapSort(T& container) {
     MinHeap<typename T::value_type> heap(container);
-    std::integral auto sz = container.size();
-    for (decltype(sz) i = 0; i != sz; ++i) {
-        container[i] = heap.extract();
+    for (typename T::value_type &el : container) {
+        el = heap.extract();
     }
 }
 

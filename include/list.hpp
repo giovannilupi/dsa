@@ -16,6 +16,8 @@ struct SListNode {
 /**
  * Detects the presence of a cycle in a list.
  * This uses the Floyd's cycle detection algorithm.
+ * It works by moving a slow pointer one node at a time, and a fast pointer two nodes at a time.
+ * If the two pointers meet before the end of the list, there is a cycle.
  * The advantage of this algorithm is that it keep a linear time complexity,
  * but uses O(1) memory.
  */
@@ -34,8 +36,9 @@ bool checkCycle(SListNode<T>* head) {
 /**
  * Detects the origin node of a cycle in a list.
  * This is a more involved version of the Floyd's cycle detection algorithm.
- * Once a loop is detected, it moves the slow and fast pointer one move at a time.
- * Eventually, the two pointers will meet at the origin of the loop.
+ * Once a loop is detected, it resets the slow pointer to the head of the list.
+ * The slow and fast pointers are then moved one node at a time.
+ * Eventually, the pointers will meet at the origin of the cycle.
  */ 
 template <typename T>
 SListNode<T>* findCycle(SListNode<T>* head) {

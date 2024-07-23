@@ -28,7 +28,7 @@ public:
      * Constructs a heap from a container.
      * Complexity: O(n)
      */
-    template <std::ranges::range Container>
+    template <std::ranges::random_access_range Container>
     Heap(const Container& container) : vec(container.begin(), container.end()) {
         buildHeap();
     }
@@ -37,7 +37,7 @@ public:
      * Constructs a heap from an iterator range.
      * Complexity: O(n)
      */
-    template <std::input_iterator Iter>
+    template <std::random_access_iterator Iter>
     Heap(Iter first, Iter last) : vec(first, last) {
         buildHeap();
     }
