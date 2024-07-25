@@ -2,6 +2,7 @@
 
 #include <climits>
 #include "alg_concepts.hpp"
+#include "common.hpp"
 
 namespace alg {
 
@@ -10,15 +11,14 @@ namespace alg {
  */ 
 template <SortableContainer T>
 void selectionSort(T& container) {
-    using SzType = decltype(container.size());
-    SzType sz = container.size();
-    for (SzType i = 0; i < sz; ++i) {
-        SzType minidx = i;
-        for (SzType j = i+1; j < sz; ++j) {
+    index sz = container.size();
+    for (index i = 0; i < sz; ++i) {
+        index minidx = i;
+        for (index j = i+1; j < sz; ++j) {
             if (container[j] < container[minidx]) minidx = j;
         }
         std::swap(container[i], container[minidx]);
     }
 }
 
-}
+} // namespace alg

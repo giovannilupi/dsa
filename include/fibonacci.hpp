@@ -16,8 +16,7 @@ inline uint64_t fibTailRec(uint64_t n, uint64_t a = 0, uint64_t b = 1) {
     return fibTailRec(n-1, b, a+b); 
 }
 
-}
-
+} // namespace detail
 
 /**
  * Naive recursive implementation.
@@ -54,4 +53,4 @@ inline uint64_t fibIter(uint64_t n) {
     return curr;
 }
 
-}
+} // namespace alg

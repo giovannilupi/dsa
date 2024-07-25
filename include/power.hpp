@@ -26,7 +26,7 @@ int64_t powSquaringTailRecHelper(T base, uint8_t exp, T accum = 1) {
     return powSquaringTailRecHelper(base*base, exp>>1, accum);
 }
 
-}
+} // namespace detail
 
 /**
  * Naive recursive implementation of integer based power.
@@ -89,4 +89,4 @@ int64_t powSquaringTailRec(T base, uint8_t exp) {
     return detail::powSquaringTailRecHelper(base, exp);
 }
 
-}
+} // namespace alg

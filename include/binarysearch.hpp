@@ -19,7 +19,7 @@ index bSearchRecHelp(const T& container, const typename T::value_type& val, inde
     else return bSearchRecHelp(container, val, mid+1, high);
 }
 
-}
+} // namespace detail
 
 /**
 * Iterative binary search algorithm.
@@ -73,4 +73,4 @@ T bSearchLibIt (T first, T last, const typename T::value_type& val) {
     return (it != last && !(val < *it)) ? it : last;
 }
 
-}
+} // namespace alg

@@ -2,6 +2,8 @@
 
 #include <concepts>
 
+namespace alg {
+
 /**
  * Computes a mod m.
  * In number theory, the result is guaranteed to be in the renge [0, m).
@@ -14,3 +16,5 @@ T mod(T a, T m) {
     T r = a % m;
     return (r < 0) ? (r + m) : r;
 }
+
+} // namespace alg

@@ -235,7 +235,7 @@ private:
     inline int right(int idx) const { return (idx << 1) + 2; }
 };
 
-}
+} // namespace detail
 
 /**
  * Comparison function for max heap.
@@ -265,4 +265,4 @@ template <typename T>
     requires std::strict_weak_order<MinHeapCmp<T>, T, T>
 using MinHeap = detail::Heap<T, MinHeapCmp<T>>;
 
-}
+} // namespace alg

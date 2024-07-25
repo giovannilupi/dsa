@@ -1,7 +1,8 @@
 #pragma once
 
-#include "alg_concepts.hpp"
 #include <concepts>
+#include "alg_concepts.hpp"
+#include "common.hpp"
 
 namespace alg {
 
@@ -10,9 +11,10 @@ namespace alg {
  */
 template <SortableContainer T>
 void insertionSort(T& container) {
-    for (int i = 1; i < container.size(); ++i) {
+    index sz = container.size();
+    for (index i = 1; i < sz; ++i) {
         // We go backwards looking for the insert position
-        for (int j = i; j && container[j-1] > container[j]; --j) {
+        for (index j = i; j && container[j-1] > container[j]; --j) {
             std::swap(container[j-1], container[j]);
         }
     }
@@ -22,10 +24,10 @@ void insertionSort(T& container) {
  * Insertion sort with a custom low and high index.
  * The high index is inclusive.
  */
-template <SortableContainer T, std::integral Q>
-void insertionSort(T& container, Q low, Q high) {
-    for (Q i = 1; i <= high; ++i) {
-        for (Q j = i; j && container[j-1] > container[j]; --j) {
+template <SortableContainer T>
+void insertionSortIdx(T& container, index low, index high) {
+    for (index i = low + 1; i <= high; ++i) {
+        for (index j = i; j > low && container[j-1] > container[j]; --j) {
             std::swap(container[j-1], container[j]);
         }
     }
@@ -42,4 +44,4 @@ void insertionSortModern(T& container) {
         rotate(upper_bound(itb, it, *it), it, next(it));
 }
 
-}
+} // namespace alg

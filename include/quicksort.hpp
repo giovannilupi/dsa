@@ -83,7 +83,7 @@ void quickSortCoarseHelper(T& container, index low, index high) {
     }
 }
 
-}
+} // namespace detail
 
 /**
  * Generic implementation of the classic quick sort algorithm.
@@ -120,4 +120,4 @@ void quickSortCoarse(T& container) {
     detail::quickSortCoarseHelper(container, low, high);
 }
 
-}
+} // namespace alg

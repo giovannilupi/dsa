@@ -16,7 +16,7 @@ inline uint64_t factTailRecHelper(uint64_t n, uint64_t accum) {
     return factTailRecHelper(n-1, n * accum);
 }
 
-}
+} // namespace detail
 
 /**
  * Naive recursive implementation.
@@ -44,4 +44,4 @@ inline uint64_t factIter(uint64_t n) {
     return res;
 } 
 
-}
+} // namespace alg

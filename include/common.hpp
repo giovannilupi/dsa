@@ -10,4 +10,4 @@ namespace alg {
      * The current implementation of the index type from the guidelines is a simple type alias.
      */
     using index = std::ptrdiff_t;
-}
+} // namespace alg

@@ -59,4 +59,4 @@ SListNode<T>* findCycle(SListNode<T>* head) {
     return slow;
 }
 
-}
+} // namespace alg

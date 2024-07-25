@@ -22,4 +22,4 @@ void heapSort(T& container) {
     }
 }
 
-}
+} // namespace alg

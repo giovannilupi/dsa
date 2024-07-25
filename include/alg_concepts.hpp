@@ -61,4 +61,4 @@ concept Matrix =
     // Must contain a random access container
     std::ranges::random_access_range<typename T::value_type>;  
 
-}
+} // namespace alg
