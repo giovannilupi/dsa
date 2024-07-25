@@ -2,23 +2,25 @@
 
 #include "alg_concepts.hpp"
 #include "heap.hpp"
+#include <algorithm>
+#include <functional>
 
 namespace alg {
 
 /**
  * Implementation of the classic heap sort algorithm.
- * Notice this does not sort the container in place,
- * as constructing the heap from the container copies the container.
- * To sort the container in place, one could change the implementation
- * of Heap to be a container adapter, or implement the heap functions
- * accepting a container as a parameter.
+ * This is a modern implementation using C++ 20 algorithm header features.
  * Complexity: O(n log n)
+ * Memory usage: O(1)
  */
 template <SortableContainer T>
 void heapSort(T& container) {
-    MinHeap<typename T::value_type> heap(container);
-    for (typename T::value_type &el : container) {
-        el = heap.extract();
+    // Turn the input container into a max heap
+    std::make_heap(container.begin(), container.end());
+    // Progressively move the largest element to the end
+    for (auto it = container.rbegin(); it != container.rend(); ++it) {
+        // Moves the root of the heap to the back
+        std::pop_heap(container.begin(), it.base());
     }
 }
 
