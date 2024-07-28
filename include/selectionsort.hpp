@@ -1,6 +1,5 @@
 #pragma once
 
-#include <climits>
 #include "alg_concepts.hpp"
 #include "common.hpp"
 
