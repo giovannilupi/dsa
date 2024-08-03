@@ -35,7 +35,7 @@ TEST_P(FactorialTest, WorksWithAllInputs) {
 }
 
 INSTANTIATE_TEST_SUITE_P(FactorialTestsGenerator, FactorialTest, 
-        ::testing::ValuesIn(factorialFunctions),
-        [](const testing::TestParamInfo<FactorialTest::ParamType> &info){
-            return info.param.first;
-        }); 
+    ::testing::ValuesIn(factorialFunctions),
+    [](const testing::TestParamInfo<FactorialTest::ParamType> &info){
+        return info.param.first;
+    }); 
