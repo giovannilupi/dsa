@@ -1,5 +1,6 @@
 #pragma once
 
+#include <__concepts/equality_comparable.h>
 #include <cmath>
 #include <unordered_set>
 #include <vector>
@@ -11,8 +12,12 @@ namespace alg {
 /**
  * Checks if a sudoku board is valid.
  * Empty cells are marked with the filler value.
+ * Assumes that the board is a square matrix.
+ * Assumes that the filler value is not a valid value for a cell.
+ * Calling this violating the assumptions causes undefined behavior.
  */
-template <Matrix T> 
+template <Matrix T>
+    requires std::equality_comparable<typename T::value_type::value_type>
 bool isValidSudoku(T &board, typename T::value_type::value_type filler) {
     // Check if the board is a square
     auto sz = board.size();

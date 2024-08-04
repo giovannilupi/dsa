@@ -182,6 +182,9 @@ SListNode<T>* genList(std::initializer_list<T> initList) {
     return toList(initList.begin(), initList.end());
 }
 
+/**
+ * Deletes a singly linked list.
+ */
 template <typename T>
 void deleteList(SListNode<T>* head) {
     SListNode<T>* curr = head;

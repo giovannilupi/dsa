@@ -58,7 +58,11 @@ template <typename T>
 concept Matrix =
     // Must provide random access to elements
     std::ranges::random_access_range<T> && 
+    // Must provide constant time size operation
+    std::ranges::sized_range<T> &&
     // Must contain a random access container
-    std::ranges::random_access_range<typename T::value_type>;  
+    std::ranges::random_access_range<std::ranges::range_value_t<T>> &&
+    // Must contain a container with constant time size operation
+    std::ranges::sized_range<std::ranges::range_value_t<T>>;
 
 } // namespace alg
