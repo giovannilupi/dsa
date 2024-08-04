@@ -14,7 +14,7 @@ using SortFunc = std::function<void(std::vector<int>&)>;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-std::map<std::string, SortFunc> sortingFunctions = {
+static std::map<std::string, SortFunc> sortingFunctions = {
     {"InsertionSort", alg::insertionSort<std::vector<int>>},
     {"InsertionSortModern", alg::insertionSortModern<std::vector<int>>},
     {"SelectionSort", alg::selectionSort<std::vector<int>>},
@@ -27,7 +27,7 @@ std::map<std::string, SortFunc> sortingFunctions = {
     {"QuickSortCoarse", alg::quickSortCoarse<std::vector<int>>},
 };
 
-std::map<std::string, std::vector<int>> testVectors = {
+static std::map<std::string, std::vector<int>> testVectors = {
     {"Sorted", {1, 2, 3, 4, 5}},
     {"Unsorted", {5, 3, 1, 4, 2}},
     {"Empty", {}},

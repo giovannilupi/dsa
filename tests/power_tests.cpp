@@ -6,7 +6,7 @@
 
 using PowFunc = std::function<int64_t(int, uint8_t)>;
 
-std::map<std::string, PowFunc> powerFunctions = {
+static std::map<std::string, PowFunc> powerFunctions = {
     {"PowerRecursive", alg::powRec<int>},
     {"PowerTailRecursive", alg::powTailRec<int>},
     {"PowerIterative", alg::powIter<int>},

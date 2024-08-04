@@ -9,13 +9,13 @@ using MatMultFunc = std::function<void(Matrix&, Matrix&, Matrix&)>;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-std::map<std::string, MatMultFunc> matMulFunctions = {
+static std::map<std::string, MatMultFunc> matMulFunctions = {
     {"MatrixMultSchoolbook", alg::matrixMultiplication<Matrix>},
     {"MatrixMultDivAndConq", alg::matrixMultDivConq<Matrix>},
     {"MatrixMultStrassen", alg::matrixMultStrassen<Matrix>},
 };
 
-std::map<std::string, std::tuple<Matrix, Matrix, Matrix>> testMatrices = {
+static std::map<std::string, std::tuple<Matrix, Matrix, Matrix>> testMatrices = {
     {"Matrix1x1", { 
         {{1}}, 
         {{2}}, 

@@ -6,7 +6,7 @@
 
 using FactFunc = std::function<uint64_t(uint64_t)>;
 
-std::map<std::string, FactFunc> factorialFunctions = {
+static std::map<std::string, FactFunc> factorialFunctions = {
     {"FactorialRecursive", alg::factRec},
     {"FactorialTailRecursive", alg::factTailRec},
     {"FactorialIterative", alg::factIter},

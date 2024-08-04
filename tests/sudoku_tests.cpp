@@ -3,7 +3,7 @@
 
 using SudokuBoard = std::vector<std::vector<char>>;
 
-std::map<std::string, std::pair<SudokuBoard, bool>> testBoards = {
+static std::map<std::string, std::pair<SudokuBoard, bool>> testBoards = {
     {"Valid9x9", {{
         {'5', '3', '.', '.', '7', '.', '.', '.', '.'},
         {'6', '.', '.', '1', '9', '5', '.', '.', '.'},

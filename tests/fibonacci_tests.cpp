@@ -6,7 +6,7 @@
 
 using FibFunc = std::function<uint64_t(uint64_t)>;
 
-std::map<std::string, FibFunc> fibonacciFunctions = {
+static std::map<std::string, FibFunc> fibonacciFunctions = {
     {"FibonacciRecursive", alg::fibRec},
     {"FibonacciTailRecursive", alg::fibTailRec},
     {"FibonacciIterative", alg::fibIter},
