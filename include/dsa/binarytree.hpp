@@ -1,6 +1,8 @@
 #pragma once
 
 #include "alg_concepts.hpp"
+#include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <queue>
 #include <concepts>
@@ -34,6 +36,21 @@ const TreeNode<T>* findExtremeTreeNode(const TreeNode<T>* root, Cmp cmp) {
     if (left && cmp(left->val, extreme->val)) extreme = left;
     if (right && cmp(right->val, extreme->val)) extreme = right;
     return extreme;
+}
+
+/**
+ * The reference to diameter is to trick to keep a global variable of what we want to maximize.
+ */
+template <typename T>
+std::size_t getTreeDiameterHelper(TreeNode<T>* root, std::size_t& diameter) {
+    if (!root) return 0;
+    // 
+    std::size_t lHeight = getTreeDiameterHelper(root->left, diameter);
+    std::size_t rHeight = getTreeDiameterHelper(root->right, diameter);
+    // 
+    diameter = std::max(diameter, lHeight + rHeight + 1);
+    // 
+    return std::max(lHeight, rHeight) + 1;
 }
 
 }
@@ -220,6 +237,55 @@ T accumulateTree(const TreeNode<T>* root) {
     T left = accumulateTree(root->left);
     T right = accumulateTree(root->right);
     return root->val + left + right;
+}
+
+/**
+ * Returns the level of a key in a binary tree.
+ * If there is no such key, by default returns 0.
+ * By changing the default value, you can start the count from a different number (e.g. 1).
+ * If there are multiple keys with the same value, returns the level of the first key found.
+ */
+template <typename T>
+std::size_t getTreeNodeLevel(const TreeNode<T>* root, const T& val, std::size_t level = 0) {
+    if (!root) return 0;
+    if (root->val == val) return level;
+    std::size_t left = getTreeNodeLevel(root->left, val, level+1);
+    if (left) return left;
+    return getTreeNodeLevel(root->right, val, level+1);
+}
+
+/**
+ * Mirrors a binary tree.
+ */
+template <typename T>
+void mirrorTree(TreeNode<T>* root) {
+    if (!root) return;
+    std::swap(root->left, root->right);
+    mirrorTree(root->left);
+    mirrorTree(root->right);
+}
+
+/**
+ * Checks if two binary trees are mirror trees.
+ */
+template <typename T>
+bool checkMirrorTree(const TreeNode<T>* root1, const TreeNode<T>* root2) {
+    if (!root1 && !root2) return true;
+    if (!root1 || !root2) return false;
+    if (root1->val != root2->val) return false;
+    return checkMirrorTree(root1->left, root2->right) &&
+           checkMirrorTree(root1->right, root2->left);
+}
+
+/**
+ * Returns the diameter of a binary tree.
+ * The diameter of a tree is the number of nodes on the longest path between two leaf nodes.
+ */
+template <typename T>
+std::size_t getTreeDiameter(const TreeNode<T>* root) {
+    std::size_t diameter = 0;
+    detail::getTreeDiameterHelper(root, diameter);
+    return diameter;
 }
 
 } // namespace alg
