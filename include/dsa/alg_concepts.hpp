@@ -12,12 +12,14 @@ namespace alg {
  * A container is sortable if it's a sequence with a sortable iterator type.
  * This definition follows the style of other std lib concepts (e.g. ranges::input_range).
  */ 
-template <typename T>
+template <typename T, typename Cmp = std::ranges::less>
 concept SortableContainer =
     // Type must be a range
     std::ranges::range<T> &&
+    // Cmp must be a valid comparator for the value type
+    std::predicate<Cmp, std::ranges::range_value_t<T>, std::ranges::range_value_t<T>> &&
     // The iterator type of the range must be sortable
-    std::sortable<std::ranges::iterator_t<T>>;
+    std::sortable<std::ranges::iterator_t<T>, Cmp>;
 
 /**
  * Printable element type.
