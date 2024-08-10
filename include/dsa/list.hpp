@@ -37,11 +37,41 @@ SListNode<T>* reverseList(SListNode<T>* head) {
 }
 
 /**
+ * Deep copies a singly linked list.
+ */
+template <typename T>
+SListNode<T>* copyList(const SListNode<T>* head) {
+    SListNode<T>* newHead = nullptr;
+    SListNode<T>* newTail = nullptr;
+    while (head) {
+        SListNode<T>* newNode = new SListNode<T>(head->val);
+        if (!newHead) newHead = newNode;
+        else newTail->next = newNode;
+        newTail = newNode;
+        head = head->next;
+    }
+    return newHead;
+}
+
+/**
+ * Returns the middle node of a singly linked list.
+ */
+template <typename T>
+SListNode<T>* getMiddleList(SListNode<T>* head) {
+    const SListNode<T>* fast = head;
+    while (fast && fast->next) { 
+        head = head->next; 
+        fast = fast->next->next; 
+    }
+    return head;
+}
+
+/**
  * Returns the length of a singly linked list.
  * Complexity: O(n)
  */
 template <typename T>
-std::size_t getListLen(SListNode<T>* head) {
+std::size_t getListLen(const SListNode<T>* head) {
     std::size_t len = 0;
     while (head) { ++len; head = head->next; }
     return len;
@@ -154,7 +184,7 @@ SListNode<T>* findList(SListNode<T>* head, const T& val) {
  * Useful for testing.
  */
 template <typename T>
-std::vector<T> listToVector(SListNode<T>* head) {
+std::vector<T> listToVector(const SListNode<T>* head) {
     std::vector<T> vec;
     while (head) {
         vec.push_back(head->val);
@@ -178,20 +208,44 @@ SListNode<typename std::iterator_traits<T>::value_type>* toList(T first, T last)
  * Converts an initializer list to a singly linked list.
  */
 template <typename T>
+SListNode<T>* toList(std::initializer_list<T> initList) {
+    SListNode<T>* head = nullptr;
+    SListNode<T>* tail = nullptr;
+    for (const auto &val : initList) {
+        SListNode<T>* new_node = new SListNode<T>(val);
+        if (!head) head = new_node;
+        if (tail) tail->next = new_node;
+        tail = new_node;
+    }
+    return head;
+}
+
+/**
+ * Converts an initializer list to a singly linked list.
+ */
+template <typename T>
 SListNode<T>* genList(std::initializer_list<T> initList) {
     return toList(initList.begin(), initList.end());
 }
 
 /**
  * Deletes a singly linked list.
+ * If the list has a cycle, the cycle is broken before deleting the list.
  */
 template <typename T>
 void deleteList(SListNode<T>* head) {
-    SListNode<T>* curr = head;
-    while (curr) {
-        SListNode<T>* nxt = curr->next;
-        delete(curr);
-        curr = nxt;
+    SListNode<T>* cycleStart = findCycle(head);
+    // Break the cycle before deleting the list
+    if (cycleStart) {
+        SListNode<T>* curr = cycleStart;
+        while (curr->next != cycleStart) curr = curr->next;
+        curr->next = nullptr;  
+    }
+    // Delete the list
+    while (head) {
+        SListNode<T>* nxt = head->next;
+        delete(head);
+        head = nxt;
     }
 }
 
@@ -204,10 +258,10 @@ void deleteList(SListNode<T>* head) {
  * but uses O(1) memory.
  */
 template <typename T>
-bool checkCycle(SListNode<T>* head) {
+bool hasCycle(const SListNode<T>* head) {
     // We can use head directly as slow pointer
-    SListNode<T>* fast = head;
-    while(fast && fast->next) {
+    const SListNode<T>* fast = head;
+    while (fast && fast->next) {
         head = head->next;
         fast = fast->next->next;
         if (head == fast) return true;
@@ -224,10 +278,11 @@ bool checkCycle(SListNode<T>* head) {
  */ 
 template <typename T>
 SListNode<T>* findCycle(SListNode<T>* head) {
+    if (!head || !head->next) return nullptr;
     SListNode<T>* slow = head; 
     SListNode<T>* fast = head;
     // Check if the list has a loop
-    while(fast && fast->next) {
+    while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
         if (slow == fast) break;
