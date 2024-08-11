@@ -66,9 +66,7 @@ public:
      */
     T extract() {
         T result = peek();
-        vec.front() = vec.back();
-        vec.pop_back();
-        heapifyDownIter(0);
+        remove();
         return result;
     }
 
@@ -98,6 +96,11 @@ public:
      * Returns the size of the heap.
      */
     size_t size() const { return vec.size(); }
+
+    /**
+     * Returns the vector representation of the heap.
+     */
+    const std::vector<T>& toVector() const { return vec; }
 
     /**
      * Prints a tree representation of the heap.
@@ -247,7 +250,7 @@ using MaxHeapCmp = std::greater<T>;
  * Comparison function for min heap.
  */
 template <typename T>
-using MinHeapCmp= std::less<T>;
+using MinHeapCmp = std::less<T>;
 
 /**
  * Implementation of a max-heap.
