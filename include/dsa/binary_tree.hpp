@@ -1,11 +1,14 @@
 #pragma once
 
 #include "alg_concepts.hpp"
+#include <__iterator/concepts.h>
+#include <__ranges/concepts.h>
 #include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <queue>
 #include <concepts>
+#include <common.hpp>
 
 namespace alg {
 
@@ -17,7 +20,7 @@ struct TreeNode {
     T val;
     TreeNode* left;
     TreeNode* right;
-    TreeNode(const T& val) : val(val) {}
+    TreeNode(const T& val) : val(val), left(nullptr), right(nullptr) {}
     TreeNode(const T& val, TreeNode* left, TreeNode* right) : val(val), left(left), right(right) {}
 };
 
@@ -39,33 +42,35 @@ const TreeNode<T>* findExtremeTreeNode(const TreeNode<T>* root, Cmp cmp) {
 }
 
 /**
- * The reference to diameter is to trick to keep a global variable of what we want to maximize.
+ * The reference to diameter is similar to using a global variable.
+ * We store in the variable the maximum diameter found so far.
+ * Aside from that, this is a recursive function that returns the height of the tree.
  */
 template <typename T>
-std::size_t getTreeDiameterHelper(TreeNode<T>* root, std::size_t& diameter) {
+std::size_t getTreeDiameterHelper(const TreeNode<T>* root, std::size_t& diameter) {
     if (!root) return 0;
-    // 
+    // Find the height of the left and right subtrees
     std::size_t lHeight = getTreeDiameterHelper(root->left, diameter);
     std::size_t rHeight = getTreeDiameterHelper(root->right, diameter);
-    // 
+    // The diameter may or may not pass from the root
     diameter = std::max(diameter, lHeight + rHeight + 1);
-    // 
+    // Typical pattern for returning the height
     return std::max(lHeight, rHeight) + 1;
 }
 
-}
+} // namespace detail
 
 /**
  * Callback function to be applied to each node of a tree.
  */
 template <typename T>
-using Callback = std::function<void(const T&)>;
+using Callback = std::function<void(T&)>;
 
 /**
  * Applies a function to each node of a tree in DFS pre-order traversal.
  */
 template <typename T>
-void preorderTreeApply(const TreeNode<T>* root, Callback<T> func) {
+void preorderTreeApply(TreeNode<T>* root, Callback<T> func) {
     if (root) {
         func(root->val);
         preorderTreeApply(root->left, func);
@@ -77,7 +82,7 @@ void preorderTreeApply(const TreeNode<T>* root, Callback<T> func) {
  * Applies a function to each node of a tree in DFS in-order traversal.
  */
 template <typename T>
-void inorderTreeApply(const TreeNode<T>* root, Callback<T> func) {
+void inorderTreeApply(TreeNode<T>* root, Callback<T> func) {
     if (root) {
         inorderTreeApply(root->left, func);
         func(root->val);
@@ -89,7 +94,7 @@ void inorderTreeApply(const TreeNode<T>* root, Callback<T> func) {
  * Applies a function to each node of a tree in DFS post-order traversal.
  */
 template <typename T>
-void postorderTreeApply(const TreeNode<T>* root, Callback<T> func) {
+void postorderTreeApply(TreeNode<T>* root, Callback<T> func) {
     if (root) {
         postorderTreeApply(root->left, func);
         postorderTreeApply(root->right, func);
@@ -101,17 +106,72 @@ void postorderTreeApply(const TreeNode<T>* root, Callback<T> func) {
  * Applies a function to each node of a tree in BFS level-order traversal.
  */
 template <typename T>
-void bfsTreeApply(const TreeNode<T>* root, Callback<T> func) {
+void bfsTreeApply(TreeNode<T>* root, Callback<T> func) {
     if (!root) return;
-    std::queue<const TreeNode<T>*> child_queue;
+    std::queue<TreeNode<T>*> child_queue;
     child_queue.push(root);
     while (!child_queue.empty()) {
-        const TreeNode<T>* node = child_queue.front();
+        TreeNode<T>* node = child_queue.front();
         func(node->val);
         child_queue.pop();
         if (node->left) child_queue.push(node->left);
         if (node->right) child_queue.push(node->right);
     }    
+}
+
+/**
+ * Converts a binary tree into a vector.
+ * The vector contains the values in level-order.
+ */
+template <typename T>
+std::vector<T> toVector(TreeNode<T>* root) {
+    std::vector<T> vec;
+    bfsTreeApply<T>(root, [&vec](T& val) { vec.push_back(val); });
+    return vec;
+}
+
+/**
+ * Converts an iterator range into a binary tree.
+ * The tree is created in level-order.
+ */
+template <std::input_or_output_iterator Iter>
+TreeNode<typename std::iterator_traits<Iter>::value_type>* toBinaryTree(Iter first, Iter last) {
+    using V = typename std::iterator_traits<Iter>::value_type;
+    if (first == last) return nullptr;
+    TreeNode<V>* root = new TreeNode<V>(*first++);
+    std::queue<TreeNode<V>*> child_queue;
+    child_queue.push(root);
+    auto it = first;
+    while (!child_queue.empty() && it != last) {
+        TreeNode<V>* node = child_queue.front();
+        child_queue.pop();
+        if (it != last) {
+            node->left = new TreeNode<V>(*it++);
+            child_queue.push(node->left);
+        }
+        if (it != last) {
+            node->right = new TreeNode<V>(*it++);
+            child_queue.push(node->right);
+        }
+    }
+    return root;
+}
+
+/**
+ * Converts a container into a binary tree.
+ * The tree is created in level-order.
+ */
+template <std::ranges::range T>
+TreeNode<typename T::value_type>* toBinaryTree(const T& container) {
+    return toBinaryTree(container.begin(), container.end());
+}
+/**
+ * Converts an initializer list into a binary tree.
+ * The tree is created in level-order.
+ */
+template <typename T>
+TreeNode<T>* toBinaryTree(std::initializer_list<T> ilist) {
+    return toBinaryTree(ilist.begin(), ilist.end());
 }
 
 /**
@@ -122,11 +182,11 @@ void bfsTreeApply(const TreeNode<T>* root, Callback<T> func) {
  * If only one of the nodes exists in the tree, returns that node.
  */
 template <typename T>
-TreeNode<T>* lcaTree(const TreeNode<T>* root, const TreeNode<T>* n1, const TreeNode<T>* n2) {
+const TreeNode<T>* lcaTree(const TreeNode<T>* root, const TreeNode<T>* n1, const TreeNode<T>* n2) {
     // If the root matches one of the nodes, it is the LCA
     if (!root || root == n1 || root == n2) return root;
-    TreeNode<T>* left = lcaTree(root->left, n1, n2);
-    TreeNode<T>* right = lcaTree(root->right, n1, n2);
+    const TreeNode<T>* left = lcaTree(root->left, n1, n2);
+    const TreeNode<T>* right = lcaTree(root->right, n1, n2);
     // If both children match one of the nodes, then the current node is the LCA
     if (left && right) return root;
     // The LCA is the node that matches one of the input nodes
@@ -217,7 +277,7 @@ std::size_t getTreeSize(const TreeNode<T>* root) {
 /**
  * Returns the height of a binary tree.
  * Here we define the height as the number of nodes in the longest path from the root to a leaf.
- * The height of an empty tree with is 0, and the height of a tree with one node is 1.
+ * The height of an empty tree is 0, and the height of a tree with one node is 1.
  */
 template <typename T>
 std::size_t getTreeHeight(const TreeNode<T>* root) {
@@ -241,16 +301,16 @@ T accumulateTree(const TreeNode<T>* root) {
 
 /**
  * Returns the level of a key in a binary tree.
- * If there is no such key, by default returns 0.
+ * If there is no such key, by default returns -1.
  * By changing the default value, you can start the count from a different number (e.g. 1).
  * If there are multiple keys with the same value, returns the level of the first key found.
  */
 template <typename T>
-std::size_t getTreeNodeLevel(const TreeNode<T>* root, const T& val, std::size_t level = 0) {
-    if (!root) return 0;
+index getTreeNodeLevel(const TreeNode<T>* root, const T& val, std::size_t level = 0) {
+    if (!root) return -1;
     if (root->val == val) return level;
-    std::size_t left = getTreeNodeLevel(root->left, val, level+1);
-    if (left) return left;
+    index left = getTreeNodeLevel(root->left, val, level+1);
+    if (left != -1) return left;
     return getTreeNodeLevel(root->right, val, level+1);
 }
 
