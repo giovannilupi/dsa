@@ -20,7 +20,9 @@ The function interfaces in this library vary, with some using indices, others us
 
 ## Theory
 
-The [notes](./notes) directory contains PDFs summarizing the theory behind many of the data structures and algorithms found in this library. These notes are not meant to be a comprehensive reference; I have simply written them for my own convenience. All notes were created in Markdown format using [Joplin](https://github.com/laurent22/joplin), and then converted to PDF using [Pandoc](https://github.com/jgm/pandoc). I share them in hope they could be useful to others.
+The [notes](./notes) directory contains Markdown files summarizing the theory behind many of the data structures and algorithms found in this library. These notes are intended for personal convenience and are shared in the hope that they might be useful to others. They were originally written in [Joplin](https://github.com/laurent22/joplin) and exported in Markdown format.
+
+Please note that GitHub currently has an [issue](https://github.com/github/markup/issues/1688) in rendering certain mathematical formulas.
 
 For a complete reference, including formal mathematical demonstrations and complexity analysis, I recommend the following books:
 
