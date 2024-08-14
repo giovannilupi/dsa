@@ -1,7 +1,6 @@
 #pragma once
 
-#include <__concepts/equality_comparable.h>
-#include <__iterator/concepts.h>
+#include <concepts>
 #include <cstddef>
 #include <initializer_list>
 #include <iostream>

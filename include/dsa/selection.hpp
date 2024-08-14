@@ -1,13 +1,13 @@
 #pragma once
 
-#include "alg_concepts.hpp"
-#include "quicksort.hpp"
-#include "common.hpp"
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
 #include <concepts>
 #include <functional>
+#include "alg_concepts.hpp"
+#include "quicksort.hpp"
+#include "common.hpp"
 
 namespace alg {
 

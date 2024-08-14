@@ -1,6 +1,6 @@
 #pragma once
 
-#include <__ranges/concepts.h>
+#include <concepts>
 #include <iterator>
 #include <iostream>
 #include <ranges>

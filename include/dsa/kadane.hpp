@@ -1,6 +1,6 @@
 #pragma once
 
-#include <__concepts/arithmetic.h>
+#include <concepts>
 #include <algorithm>
 #include <climits>
 #include <iostream>

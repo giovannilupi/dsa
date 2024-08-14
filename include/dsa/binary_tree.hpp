@@ -1,8 +1,6 @@
 #pragma once
 
 #include "alg_concepts.hpp"
-#include <__iterator/concepts.h>
-#include <__ranges/concepts.h>
 #include <algorithm>
 #include <cstddef>
 #include <functional>

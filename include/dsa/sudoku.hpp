@@ -1,6 +1,5 @@
 #pragma once
 
-#include <__concepts/equality_comparable.h>
 #include <cmath>
 #include <unordered_set>
 #include <vector>

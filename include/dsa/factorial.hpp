@@ -1,6 +1,5 @@
 #pragma once
 
-#include <__concepts/arithmetic.h>
 #include <concepts>
 #include <cstdint>
 

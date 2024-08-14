@@ -1,9 +1,9 @@
 #pragma once
 
-#include "alg_concepts.hpp"
-#include "heap.hpp"
 #include <algorithm>
 #include <functional>
+#include "alg_concepts.hpp"
+#include "heap.hpp"
 
 namespace alg {
 

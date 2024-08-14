@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 #include <map>
 #include <numeric>
-#include "bin_search_tree.hpp"
 #include "binary_tree.hpp"
 
 using namespace alg;
