@@ -34,7 +34,7 @@ int bsearch(const T& container, const typename T::value_type& val) {
 
 ### C++ STL
 
-The C++ STL has a `binary_search` function. However, this name is not very precise, as the function checks if the item is present in the sequence and returns a `bool`. The closest thing to a real binary search in the STL is the function `lower_bound`. This returns an iterator pointing to the first element in the range which does not compare less than val. This means that if the searched item is not in the sequence, the algorithm can return an iterator different from `end()`. We can however add a check after calling `lower_bound` to create our own binary search:
+The C++ STL has a `binary_search` function. However, this name is not very precise, as the function checks if the item is present in the sequence and returns a `bool`. The closest thing to a real binary search in the STL is the function `lower_bound`. This returns an iterator pointing to the first element in the range which does not compare less than `val`. This means that if the searched item is not in the sequence, the algorithm can return an iterator different from `end()`. We can however add a check after calling `lower_bound` to create our own binary search:
 
 ```C++
 template <typename T>

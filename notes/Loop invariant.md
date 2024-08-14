@@ -3,10 +3,9 @@
 For example, let’s look at a simple for loop that looks like this:
 ```
 int j = 9;
-for(int i=0; i<10; i++)  
-j--;
+for (int i = 0; i < 10; ++i) j--;
 ```
-In this example it is true (for every iteration) that i + j == 9.
+In this example it is true (for every iteration) that $i + j == 9$.
 
 When using an invariant, we need to show three things:
 1.  **Initialization**: it is true prior to the first iteration of the loop.

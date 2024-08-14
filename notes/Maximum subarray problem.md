@@ -1,4 +1,4 @@
-The maximum sum subarray problem, also known as the maximum segment sum problem, is the task of finding a contiguous subarray with the largest sum, within a given one-dimensional array A\[1...n\] of numbers. **It can be solved in *O(n)* time and *O(1)* space.**
+The maximum sum subarray problem, is the task of finding a contiguous subarray with the largest sum, within a given one-dimensional array A\[1...n\] of numbers. **It can be solved in *O(n)* time and *O(1)* space.**
 
 ![3d3d99bd23e29bc941868fe82f776bb1.png](../_resources/3d3d99bd23e29bc941868fe82f776bb1.png)
 
@@ -10,9 +10,9 @@ Some properties of this problem are:
 
 A simple single-pass algorithm known as **Kadane's algorithm** solves this problem efficiently.
 
-#### Bruteforce solution
+#### Brute-force solution
 
-The naive way to solve the problem is using a bruteforce strategy. 
+The naive way to solve the problem is using a brute-force strategy.
 
 ![34c75b6e34446ce2b83eb4965d47d401.png](../_resources/34c75b6e34446ce2b83eb4965d47d401.png)  
 We could evaluate each subarray and return the maximum. To do that, two nested loops are required. The first controls the index of the starting element, and the second controls an index moving to the right. When the second loop completes, we move the index of the first to the right. This has a complexity of *O($n^2$)*. Here is a C++ implementation:

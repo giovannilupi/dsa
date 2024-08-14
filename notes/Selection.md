@@ -11,7 +11,7 @@ More in detail, if $n$ is odd, we set both min and max to the value of the first
 
 ### Linear selection
 
-The selection problem can be solved with average linear time by leveraging technique similar to the ones employed for sorting algorithms.
+The selection problem can be solved with average linear time by leveraging techniques similar to the ones employed for sorting algorithms.
 
 #### Quick select
 
@@ -25,4 +25,4 @@ The worst case running time for quick select is the same as quicksort, which is 
 
 #### Heap select
 
-Similartly to quick select, we can leverage the heap sort extraction mecahnism to solve the selection problem in linear time. The fundamental idea is the same: achieve a speedup by partially sorting the array, which achieves a speedup compared to full sorting. We can use `build-heap` to create a heap, and the apply `extract` $k$ times to select the first $k$ elements.
+Similartly to quick select, we can leverage the heap sort extraction mecahnism to solve the selection problem in linear time. The fundamental idea is the same: achieve a speedup by partially sorting the array, which is quicker compared to full sorting. We can use `build-heap` to create a heap, and the apply `extract` $k$ times to select the first $k$ elements.

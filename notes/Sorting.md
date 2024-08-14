@@ -24,7 +24,7 @@ Sorting algorithms can be classified on the basis of various parameters:
 
 Insertion sort is a popular algorithm to use for small data sets, while for larger data sets an asymptotically efficient sort is preferable. It has several advantages. It is very simple to implement, it is stable, and in practice it is often more efficient than the other quadratic sorting algorithms.
 
-At each iteration, insertion sort removes one element from the input data, finds the location it belongs within the sorted list, and inserts it there. It repeats until no input elements remain. At each array-position, it checks the value there against the largest value in the sorted list (which happens to be next to it, in the previous array-position checked). If larger, it leaves the element in place and moves to the next. If smaller, it finds the correct position within the sorted list, shifts all the larger values up to make a space, and inserts into that correct position.
+At each iteration, insertion sort removes one element from the input data, finds the location it belongs within the sorted list, and inserts it there. It repeats until no input elements remain. At each array-position, it checks the value there against the largest value in the sorted list (which happens to be next to it, in the previous array position checked). If larger, it leaves the element in place and moves to the next. If smaller, it finds the correct position within the sorted list, shifts all the larger values up to make a space, and inserts into that correct position.
 
 ![image_proxy.gif](../_resources/image_proxy.gif)
 
@@ -58,7 +58,7 @@ void insertion_sort(Iter first, Iter last)
 }
 ```
 
-Insertion sort uses a loop invariant as a proof for correctness. The loop invariant is that for each index i, the array A\[0,i-1\], is sorted. Intuitively, because this condition remains true upon loop termination, we can conclude the algorithm is correct and the whole array is sorted.
+Insertion sort uses a loop invariant as a proof for correctness. The loop invariant is that for each index i, the array $A[0,i-1]$, is sorted. Intuitively, because this condition remains true upon loop termination, we can conclude the algorithm is correct and the whole array is sorted.
 
 The best case input is an array that is already sorted. In this case insertion sort has a linear running time (i.e., $O(n)$). During each iteration, the first remaining element of the input is only compared with the right-most element of the sorted subsection of the array.
 
@@ -230,7 +230,6 @@ The running time for the partition procedure is $Θ(n)$.
 
 **The running time of quicksort depends on how balanced each partitioning is, which in turn depends on which elements are used as pivots**. If the two sides of a partition are about the same size (the partitioning is balanced) then the algorithm runs asymptotically as fast as merge sort. If the partitioning is unbalanced, however, it can run asymptotically as slowly as insertion sort. Also notice that athough quicksort sorts in place according to the common definition, the amount of memory it uses is not constant. Since each recursive call requires a constant amount of space on the runtime stack, outside of the array being sorted, quicksort requires space proportional to the maximum depth of the recursion, which can be as much as $O(n)$ in the worst case.
 
-The **worst case** occurs when the partitioning produces one sub-problem with size $n-1$ and one with size $0$ for each recursive call. This **occurs when the input array is sorted** (either in ascending or descending order). In this case, the depth of recusion becomes  $O(n)$ and the algorithm complexity becomes $Θ(n^2)$. At the opposite, the best case is that in which each split partitions the array in two parts of equal size, in which case the complexity becomes $Θ(n logn)$.
+The **worst case** occurs when the partitioning produces one sub-problem with size $n-1$ and one with size $0$ for each recursive call. This **occurs when the input array is sorted** (either in ascending or descending order). In this case, the depth of recusion becomes $O(n)$ and the algorithm complexity becomes $Θ(n^2)$. At the opposite, the best case is that in which each split partitions the array in two parts of equal size, in which case the complexity becomes $Θ(n logn)$.
 
 Because a sorted input array is a relatively common case, it is possible to design a randomized version of quicksort to obtain good performance over a larger range of inputs. The idea is also extremely simple: instead of always using the same element as pivot, we can choose a random element and swap it with the last one in the array. We then call the parition procedure discussed before, which works exactly as before. So in practice, we can simply wrap the call to partiition in an outer function which randomly selects a pivot and puts it in the expected position.
-
