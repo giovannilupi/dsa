@@ -33,7 +33,7 @@ index lcsMemoizedHelper(const T& c1, const T& c2, index i, index j, std::vector<
     return table[i][j] = std::max(lcsMemoizedHelper(c1, c2, i - 1, j, table), lcsMemoizedHelper(c1, c2, i, j - 1, table));
 }
 
-}
+} // namespace detail
 
 /**
  * Returns the length of the longest common subsequence of two containers.
@@ -86,4 +86,4 @@ index lcsDP(const T& c1, const T& c2) {
     return table[sz2];
 }
 
-}
+} // namespace dsa

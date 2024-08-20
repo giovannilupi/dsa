@@ -49,7 +49,7 @@ std::pair<index, index> getExtremeSubArrayIdx(const T& container, Cmp cmp, const
     return {maxL, maxR};
 }
 
-}
+} // namespace detail
 
 /**
  * Returns the mainimum sum in a contiguous subarray in the given container.
@@ -93,4 +93,4 @@ std::pair<index, index> getMaxSubArrayIdx(const T& container) {
     return detail::getExtremeSubArrayIdx(container, std::less<typename T::value_type>(), limit);
 }
 
-}
+} // namespace alg
