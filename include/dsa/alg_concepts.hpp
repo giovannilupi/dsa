@@ -67,4 +67,13 @@ concept Matrix =
     // Must contain a container with constant time size operation
     std::ranges::sized_range<std::ranges::range_value_t<T>>;
 
+
+/**
+ * A string-like type.
+ */
+template <typename T>
+concept StringLike = 
+    // Must be convertible to std::string_view
+    std::is_convertible_v<T, std::string_view>;
+
 } // namespace alg
