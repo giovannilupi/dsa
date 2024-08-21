@@ -13,6 +13,9 @@ using BSearchIdxFunc = std::function<int(const std::vector<int>&, const int&)>;
 // Type alias for the binary search functions with iterator return type
 using BSearchIterFunc = std::function<std::vector<int>::const_iterator(const std::vector<int>&, const int&)>;
 
+// Type alias for the binary search on a matrix
+using BSearchMatrixFunc = std::function<std::pair<int, int>(const std::vector<std::vector<int>>& matrix, const int& target)>;
+
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
@@ -61,6 +64,18 @@ static std::map<std::string, std::tuple<std::vector<int>, int, int>> testVectors
     }}
 };
 
+static std::map<std::string, std::tuple<std::vector<std::vector<int>>, int, std::pair<int, int>>> testMatrices = {
+    {"EmptyMatrix", {{{}}, 1, {-1, -1}}},
+    {"SingleElementMatrix", {{{1}}, 1, {0, 0}}},
+    {"SingleElementNotFound", {{{1}}, 2, {-1, -1}}},
+    {"TargetInMiddle", {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, 5, {1, 1}}},
+    {"TargetAtBeginning", {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, 1, {0, 0}}},
+    {"TargetAtEnd", {{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}, 9, {2, 2}}},
+    {"TargetNotFound", {{{1, 3, 5}, {7, 9, 11}, {13, 15, 17}}, 6, {-1, -1}}},
+    {"SingleRowFound", {{{1, 3, 5, 7, 9}}, 7, {0, 3}}},
+    {"SingleColumnFound", {{{1}, {3}, {5}, {7}, {9}}, 5, {2, 0}}},
+};
+
 class BSearchIndexTest : 
     public ::testing::TestWithParam<std::tuple<
     std::pair<const std::string, BSearchIdxFunc>,
@@ -73,6 +88,11 @@ class BSearchIteratorTest :
     std::pair<const std::string, std::tuple<std::vector<int>, int, int>>>>
 {};
 
+class BSearchMatrixTest : 
+    public ::testing::TestWithParam<std::pair<
+    const std::string, std::tuple<std::vector<std::vector<int>>, int, std::pair<int, int>>>>
+{};
+
 TEST_P(BSearchIndexTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
     auto param = GetParam();
@@ -82,7 +102,6 @@ TEST_P(BSearchIndexTest, WorksWithAllInputs) {
     auto val = std::get<1>(testInput);
     auto expected = std::get<2>(testInput);
 
-    // Check if the container is a palindrome
     EXPECT_EQ(bSearchFunc(container, val), expected);
 }
 
@@ -98,8 +117,17 @@ TEST_P(BSearchIteratorTest, SearchTests) {
                             ? container.cend() 
                             : std::next(container.cbegin(), expectedIdx);
 
-    // Check if the container is a palindrome
     EXPECT_EQ(bSearchFunc(container, val), expectedIter);
+}
+
+TEST_P(BSearchMatrixTest, SearchTests) {
+    // Get the parameters for the current test case
+    auto param = GetParam().second;
+    auto matrix = std::get<0>(param);
+    auto val = std::get<1>(param);
+    auto expected = std::get<2>(param);
+
+    EXPECT_EQ(alg::bsearchMatrix(matrix, val), expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(BSearchIdxTestsGenerator, BSearchIndexTest, 
@@ -112,4 +140,10 @@ INSTANTIATE_TEST_SUITE_P(BSearchIterTestsGenerator, BSearchIteratorTest,
     Combine(ValuesIn(iterBSearchFunctions), ValuesIn(testVectors)),
     [](const testing::TestParamInfo<BSearchIteratorTest::ParamType>& info) {
         return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
+    });
+
+INSTANTIATE_TEST_SUITE_P(BSearchMatrixTestsGenerator, BSearchMatrixTest,
+    ::testing::ValuesIn(testMatrices),
+    [](const testing::TestParamInfo<BSearchMatrixTest::ParamType>& info) {
+        return std::get<0>(info.param);
     });

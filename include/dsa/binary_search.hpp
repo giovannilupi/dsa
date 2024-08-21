@@ -9,7 +9,8 @@ namespace alg {
 
 namespace detail {
 
-template <SortableContainer T>
+template <std::ranges::random_access_range T>
+    requires std::totally_ordered<typename T::value_type>
 index bSearchRecHelp(const T& container, const typename T::value_type& val, index low, index high) {
     if (low > high) return -1;
     index mid = low + (high - low) / 2;
@@ -23,7 +24,8 @@ index bSearchRecHelp(const T& container, const typename T::value_type& val, inde
 /**
 * Iterative binary search algorithm.
 */ 
-template <SortableContainer T>
+template <std::ranges::random_access_range T>
+    requires std::totally_ordered<typename T::value_type>
 index bsearch(const T& container, const typename T::value_type& val) {
     index low = 0, high = container.size() - 1;
     while (low <= high) {
@@ -39,10 +41,36 @@ index bsearch(const T& container, const typename T::value_type& val) {
 * Tail recursive algorithm.
 * Could alternatively be implemented using iterators instead of integral indexes.
 */ 
-template <SortableContainer T>
+template <std::ranges::random_access_range T>
+    requires std::totally_ordered<typename T::value_type>
 index bSearchRec(const T& container, const typename T::value_type& val) {
     index low = 0, high = container.size() - 1;
     return detail::bSearchRecHelp(container, val, low, high); 
+}
+
+/**
+ * Binary search on a matrix.
+ * The matrix must be sorted in row-major order.
+ * This means the flattened matrix is a sorted array.
+ * Returns the row and column of the searched value.
+ */
+template <Matrix T>
+    requires SortableContainer<typename T::value_type>
+std::pair<index, index> bsearchMatrix(const T& matrix, const typename T::value_type::value_type& val) {
+    index rows = matrix.size();
+    if (!rows) return {-1, -1};
+    index cols = matrix[0].size();
+    index low = 0;
+    index high = rows * cols - 1;
+    while (low <= high) {
+        index mid = low + (high - low) / 2;
+        index row = mid / cols;
+        index col = mid % cols;
+        if (val < matrix[row][col]) high = mid - 1;
+        else if (matrix[row][col] < val) low = mid + 1;
+        else return {row, col};
+    }
+    return {-1, -1};
 }
 
 /**
