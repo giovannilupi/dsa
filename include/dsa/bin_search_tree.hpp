@@ -23,7 +23,19 @@ bool checkBSTHelper(const TreeNode<T>* root, const TreeNode<T>*& prev) {
     return checkBSTHelper(root->right, prev);
 }
 
+/**
+ * Helper function to get the kth smallest element in a binary search tree.
+ */
+template <typename T>
+const TreeNode<T>* getBSTKthMinHelper(const TreeNode<T>* root, std::size_t& k) {
+    if (!root) return nullptr;
+    const TreeNode<T>* left = getBSTKthMinHelper(root->left, k);
+    if (left) return left;
+    if (!k--) return root;
+    return getBSTKthMinHelper(root->right, k);
 }
+
+} // namespace detail
 
 /**
  * Converts a binary tree into a binary search tree, keeping the original tree structure.
@@ -199,6 +211,15 @@ const TreeNode<T>* getBSTMax(const TreeNode<T>* root) {
     if (!root) return nullptr;
     while (root->right) root = root->right;
     return root;
+}
+
+/**
+ * Finds the kth smallest value in a binary search tree using an iterative loop.
+ * The counting starts from 0, which equals to the minimum element in the tree.
+ */
+template <typename T>
+const TreeNode<T>* getBSTKthMin(const TreeNode<T>* root, std::size_t k) {
+    return detail::getBSTKthMinHelper(root, k);
 }
 
 } // namespace alg

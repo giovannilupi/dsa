@@ -157,6 +157,20 @@ TEST_P(BSTTest, GetMinMaxWorks) {
     }
 }
 
+TEST_P(BSTTest, GetKthMinWorks) {
+    TreeNode<int>* tree = GetParam().second;
+    if (!tree) {
+        EXPECT_FALSE(getBSTKthMin(tree, 0));
+    }
+    else {
+        auto vec = toVector(tree);
+        std::sort(vec.begin(), vec.end());
+        auto sz = vec.size();
+        auto kthMin = getBSTKthMin(tree, sz / 2);
+        EXPECT_EQ(kthMin->val, vec[sz / 2]);
+    }
+}
+
 TEST_P(BSTTest, CheckBSTWorks) {
     TreeNode<int>* tree = copyTree(GetParam().second);
     EXPECT_TRUE(checkBST(tree));
