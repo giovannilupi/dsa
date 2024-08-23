@@ -107,10 +107,11 @@ Fundamentally, memoization and tabulation accomplish the same goal — they stor
 Given the same problem, the asymptotic time complexity of the two approaches is the same. However, **tabulation usually outperforms memoization by a constant factor**. This is because tabulation has no overhead for recursion. Moreover, tabulation can run larger inputs as it is not limited by the maximum size of the call stack (which causes additional memory allocation in the case of memoization).
 
 The downside of tabulation is that the top-down approach is often easier to implement, because we just add an array or a lookup table to store results during recursion. In the bottom-up approach instead, we need to define an iterative order to fill the table and take care of several boundary conditions. Also, to come up with a bottom-up approach, we often need to formulate the problem recursively first, and then turn the recursion into iteration. The sequence of steps required to come up with a bottom-up solution is generally the following:
-1. Formulate a bruteforece recursive solution.
+
+1.  Formulate a bruteforece recursive solution.
 2.  Identify the parameters that change in each recursive call. If $N$ parameters in input to the procedure are changing, we need an N-dimensional array to store the result of each subproblem. We can then use memoization to optimize the problem.
-3.  Given the N-dimensional array identified at the previous step, we can try to find a way to iteratively fill the table row by row. Finding such procedure could be non-trivial, but it is exactly what consitutes the bottom-up approach.
-4.  Finally, by observing which information we need to fill a row, 
+3.  Given the N-dimensional array identified at the previous step, we can try to find a way to iteratively fill the table row by row. Finding such procedure could be non-trivial, but it is exactly what constitutes the bottom-up approach.
+4.  Finally, by observing which information we need to fill a row, we may optimize our memory usage by only storing a part of our table at each iteration. For example, if the problem requires using a 2D table, it is often enough to keep track of the previous row.
 
 Notice that some problems are expressed naturally in a bottom-up way. For example, while it is possible to formulate a top-down Fibonacci algorithm, the cache is still filled up in a bottom-up fashion, since we can only start filling it once we have reached our way to the bottom.
 
@@ -151,11 +152,11 @@ In the recursion tree, we notice that some problems are solved multiple times.
 
 ![aaa82cab302140ad349155f5e0bd53f6.png](../_resources/aaa82cab302140ad349155f5e0bd53f6.png)
 
-This means we can think of using memoization to store the result to each subproblem. In the recursion, there are two parameters that cab can change the result, which are $n$ and $m$. This means that, to store the result of each subproblem, we need a 2D array. We need the matrix to have $m+1$ rows and $n+1$ columns to include the empty string, which is a valid case for recursion. Each cell in the DP table represents a different chopping that we call this function on. For example the cell $DP[0][n+1]$ equates to the call $lcs("", "GXTXAYB")$.
+This means we can think of using memoization to store the result to each subproblem. In the recursion, there are two parameters that can change the result, which are $n$ and $m$. This means that, to store the result of each subproblem, we need a 2D array. We need the matrix to have $m+1$ rows and $n+1$ columns to include the empty string, which is a valid case for recursion. Each cell in the DP table represents a different chopping that we call this function on. For example the cell $DP[0][n+1]$ equates to the call $lcs("", "GXTXAYB")$.
 
 ![c4e8f8f8a6ee2b33662ff343a1a88cd8.png](../_resources/c4e8f8f8a6ee2b33662ff343a1a88cd8.png)
 
-Now we can modify our recursive solution to first do a lookup in this table and perform the recursice call only when the cell is empty. Both the time and space complexity become now proportional to the size of the table, which is $O(m+n)$.
+Now we can modify our recursive solution to first do a lookup in this table and perform the recursive call only when the cell is empty. Both the time and space complexity become now proportional to the size of the table, which is $O(m+n)$.
 
 The final step is turning the recursion into iteration by proceeding bottom up. We can start by filling the first row and column of the table with 0s, since the LCS of any string with the empty string is trivially 0.
 
@@ -171,13 +172,14 @@ The 0/1 Knapsack Problem states that you have a backpack with a weight limit, an
 
 Since the task is to maximize the value stored in the bag, we can be asked to either return the maximum value possible, or return the set of items to include in the bag. For example, if we have 4 items to pick from, we might be asked to return either their value (say 20), or a vector of booleans (such as ${0 ,1, 1, 1}$). For simplicity, we will consider the maximum value case, and in the end, show a way to retrieve the objects that make up that value.
 
-The first step is to formulate a recursive solution by considering all possible combinations of items. 
+The first step is to formulate a recursive solution by considering all possible combinations of items.
 
 ![86b279194b6bf1cd32c7d1bdbbb63f26.png](../_resources/86b279194b6bf1cd32c7d1bdbbb63f26.png)
 
 We need to consider all subsets whose total weight is smaller than the total capacity, and from them, pick the subset with the maximum profit. We obtain all subsets by considering two cases for each item:
-1. The item is included in the subset. In this case, the subest has the value of the n$th$ items chosen plus the maximum value obtained by remaining $n-1$ items and remaining weight.
-2. The item is not included in the subset. Then, the subset value is equal to the maximum value obtained by $n-1$ items.
+
+1.  The item is included in the subset. In this case, the subest has the value of the n$th$ items chosen plus the maximum value obtained by remaining $n-1$ items and remaining weight.
+2.  The item is not included in the subset. Then, the subset value is equal to the maximum value obtained by $n-1$ items.
 
 ```C++
 int knapSack(int W, int wt[], int val[], int n)
@@ -204,17 +206,18 @@ The recursive solution has to solve multiple times the same subproblems, which w
 
 ![c35b2af85394aead30f7f21d2860712b.png](../_resources/c35b2af85394aead30f7f21d2860712b.png)
 
-So, we can optimize the algorithm using memoization. We notice that the recursive calls change two parameters in input to the function: the total capacity and the number of items to consider. Therefore, we need to employ a 2D data structure to store a particular state $(n, w)$.  
-			 
+So, we can optimize the algorithm using memoization. We notice that the recursive calls change two parameters in input to the function: the total capacity and the number of items to consider. Therefore, we need to employ a 2D data structure to store a particular state $(n, w)$.
+
 ![c61ad8e0129863b8f3485a76749882b3.png](../_resources/c61ad8e0129863b8f3485a76749882b3.png)
 
 We can initialize the table with $-1$, and then add a case in the recursive algorithm to check if the cell with the given input size and capacity has already been filled. Only in the case it is not yet filled, we proceed with the recursive invocation.
 
-The last step is to find a wat to fill up the previously identified table row by row using iteration. The intuition here is that, given a cell, if the item has a weight greater than the current capacity, we cannot include it in our solution. We can however include in the solution all previous items that fit within the capacity. This equate to taking the value of $DP[i-1][j]$. Othwerwise, we have a choice: including the item or not. If we do not include the item, we must take $DP[i-1][j]$ as before. If we include the item instead, the value of the cell with be the value of the item we have just taken plus the best solution for the remaining capacity (excluding this item). Of course, we will make our choice depedending on which of the two solutions maximixe our value. 
+The last step is to find a wat to fill up the previously identified table row by row using iteration. The intuition here is that, given a cell, if the item has a weight greater than the current capacity, we cannot include it in our solution. We can however include in the solution all previous items that fit within the capacity. This equate to taking the value of $DP[i-1][j]$. Othwerwise, we have a choice: including the item or not. If we do not include the item, we must take $DP[i-1][j]$ as before. If we include the item instead, the value of the cell with be the value of the item we have just taken plus the best solution for the remaining capacity (excluding this item). Of course, we will make our choice depedending on which of the two solutions maximixe our value.
 
 ![b034d3b6a8d617c988e3adfcf0f788a8.png](../_resources/b034d3b6a8d617c988e3adfcf0f788a8.png)
 
 For example, given cell $DP[3][3]$, we can decide to either take the value of $DP[2][3]$, or take $val_i + DP[2][3-w_i]$. In this case, item 3 has value 40 and weight 3, so we will take $40 + DP[2][0]$, which is $40$.
+
 ```C++
 int knapSack(int W, int wt[], int val[], int n)
 {
