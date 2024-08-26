@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <cstddef>
+#include <queue>
 #include <type_traits>
 #include <vector>
 #include "common.hpp"
@@ -99,6 +100,44 @@ typename TCont::value_type knapsackDP(typename TCont::value_type capacity,
         }
     }
     return table[capacity];
+}
+
+/**
+ * Returns the maximum value that can be stored in the knapsack with the given capacity.
+ * This uses the fractional knapsack algorithm.
+ * Complexity: O(n log n).
+ */
+template <std::ranges::random_access_range TCont>
+    requires std::signed_integral<std::ranges::range_value_t<TCont>>
+double knapsackFractional(double capacity,
+                          const TCont& weights,
+                          const TCont& values) {
+    std::size_t sz = weights.size();
+    if (sz != values.size()) throw std::invalid_argument("Weights and values have different sizes");
+    // Fast retrieval of item with largest value-to-weight ratio and its index in the weights container
+    std::priority_queue<std::pair<double, index>> heap;
+    // Fill the heap
+    for (std::size_t i = 0; i != sz; ++i) {
+        if (!weights[i]) throw std::invalid_argument("Weight cannot be zero");
+        double ratio = static_cast<double>(values[i]) / static_cast<double>(weights[i]);
+        heap.emplace(ratio, i);
+    }
+    double res = 0.0;
+    while (capacity > 0.0 && !heap.empty()) {
+        auto [ratio, idx] = heap.top();
+        heap.pop();
+        // If the current item fits in the knapsack, we add it completely
+        if (weights[idx] <= capacity) {
+            res += values[idx];
+            capacity -= weights[idx];
+        }
+        // Otherwise, we add the biggest possible fraction of it until the knapsack is full
+        else {
+            res += ratio * capacity;
+            break;
+        }
+    }
+    return res;
 }
 
 } // namespace alg
