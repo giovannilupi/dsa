@@ -104,7 +104,9 @@ typename TCont::value_type knapsackDP(typename TCont::value_type capacity,
 
 /**
  * Returns the maximum value that can be stored in the knapsack with the given capacity.
- * This uses the fractional knapsack algorithm.
+ * This uses the fractional knapsack algorithm,
+ * meaning we are allowed to take fractions of each item.
+ * This uses a greedy approach.
  * Complexity: O(n log n).
  */
 template <std::ranges::random_access_range TCont>
@@ -138,6 +140,31 @@ double knapsackFractional(double capacity,
         }
     }
     return res;
+}
+
+/**
+ * Returns the maximum value that can be stored in the knapsack with the given capacity.
+ * This uses the unbounded knapsack algorithm, 
+ * meaning we're allowed to use unlimited number of instances of an item.
+ * Complexity: O(n * capacity).
+ */
+template <std::ranges::random_access_range TCont>
+    requires std::signed_integral<std::ranges::range_value_t<TCont>>
+typename TCont::value_type knapsackUnbounded(typename TCont::value_type capacity, 
+                                             const TCont& weights, 
+                                             const TCont& values) {
+    std::size_t sz = weights.size();
+    if (sz != values.size()) throw std::invalid_argument("Weights and values have different sizes");
+    std::vector<typename TCont::value_type> table(capacity + 1, 0);
+    // Iterate over each item
+    for (std::size_t i = 1; i <= sz; ++i) {
+        // Notice the order of traversal is opposite to the 0-1 knapsack
+        for (std::size_t j = 1; j <= capacity; ++j) {
+            // Compared to the 0-1 knapsack, if we pick an item we stay on its same row
+            if (weights[i - 1] <= j) table[j] = std::max(table[j], table[j - weights[i - 1]] + values[i - 1]);
+        }
+    }
+    return table[capacity];
 }
 
 } // namespace alg

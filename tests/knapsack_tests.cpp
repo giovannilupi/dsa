@@ -24,13 +24,23 @@ static std::map<std::string, std::pair<std::tuple<int, std::vector<int>, std::ve
 };
 
 static std::map<std::string, std::pair<std::tuple<double, std::vector<int>, std::vector<int>>, double>> fracTestCases = {
-    {"emptyInput", {{50.0, {}, {}}, 0.0}},
+    {"EmptyInput", {{50.0, {}, {}}, 0.0}},
     {"ZeroCapacity", {{0.0, {10, 20, 30}, {60, 100, 120}}, 0.0}},
     {"SingleItem", {{50.0, {10}, {60}}, 60.0}},
     {"SingleItemTooLarge", {{30.0, {60}, {50}}, 25.0}},
     {"AllItemsFit", {{60.0, {10, 20, 30}, {60, 100, 120}}, 280.0}},
     {"SimpleCase", {{50.0, {10, 20, 30}, {60, 100, 120}}, 240.0}},
     {"MultipleItemsFractional", {{25.0, {10, 15, 20, 25}, {40, 60, 100, 80}}, 120.0}},
+};
+
+static std::map<std::string, std::pair<std::tuple<double, std::vector<int>, std::vector<int>>, double>> unboundedTestCases = {
+    {"NoItems", {{0, {}, {}}, 0}},
+    {"SingleItemFits", {{5, {5}, {10}}, 10}},
+    {"SingleItemTooHeavy", {{5, {6}, {10}}, 0}},
+    {"NoValueItems", {{10, {2, 3, 4}, {0, 0, 0}}, 0}},
+    {"MaxValueWithSmallWeight", {{100, {1, 50}, {1, 30}}, 100}},
+    {"SimpleCase", {{8, {1, 3, 4, 5}, {10, 40, 50, 70}}, 110}},
+    {"SimpleCase2", {{10, {3, 4, 6, 8}, {15, 25, 20, 10}}, 55}},
 };
 
 class KnapsackTest :
@@ -58,12 +68,12 @@ INSTANTIATE_TEST_SUITE_P(KnapsackTestsGenerator, KnapsackTest,
         return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
     });
 
-class KnapsackFactionalTest :
+class KnapsackFractionalTest :
     public ::testing::TestWithParam<std::pair<const std::string, 
     std::pair<std::tuple<double, std::vector<int>, std::vector<int>>, double>>>
 {};
 
-TEST_P(KnapsackFactionalTest, WorksWithAllInputs) {
+TEST_P(KnapsackFractionalTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
     auto param = GetParam();
     auto knapParams = std::get<1>(param);
@@ -75,8 +85,32 @@ TEST_P(KnapsackFactionalTest, WorksWithAllInputs) {
     EXPECT_EQ(alg::knapsackFractional(capacity, weights, values), expected);
 }
 
-INSTANTIATE_TEST_SUITE_P(KanpsackFractionalTestsGenerator, KnapsackFactionalTest,
+INSTANTIATE_TEST_SUITE_P(KanpsackFractionalTestsGenerator, KnapsackFractionalTest,
     ::testing::ValuesIn(fracTestCases),
-    [](const testing::TestParamInfo<KnapsackFactionalTest::ParamType>& info) {
+    [](const testing::TestParamInfo<KnapsackFractionalTest::ParamType>& info) {
+        return std::get<0>(info.param);
+    });
+
+class KnapsackUnboundedTest :
+    public ::testing::TestWithParam<std::pair<const std::string, 
+    std::pair<std::tuple<double, std::vector<int>, std::vector<int>>, double>>>
+{};
+
+TEST_P(KnapsackUnboundedTest, WorksWithAllInputs) {
+    // Get the parameters for the current test case
+    auto param = GetParam();
+    auto knapParams = std::get<1>(param);
+    auto capacity = std::get<0>(knapParams.first);
+    auto weights = std::get<1>(knapParams.first);
+    auto values = std::get<2>(knapParams.first);
+    auto expected = knapParams.second;
+
+    EXPECT_EQ(alg::knapsackUnbounded(capacity, weights, values), expected);
+}
+
+
+INSTANTIATE_TEST_SUITE_P(KanpsackUnboundedTestsGenerator, KnapsackUnboundedTest,
+    ::testing::ValuesIn(unboundedTestCases),
+    [](const testing::TestParamInfo<KnapsackUnboundedTest::ParamType>& info) {
         return std::get<0>(info.param);
     });
