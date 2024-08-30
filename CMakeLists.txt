@@ -29,7 +29,7 @@ file(GLOB TEST_SOURCES "tests/*.cpp")
 add_executable(runTests ${TEST_SOURCES})
 
 # Link the test executable with Google Test libraries
-target_link_libraries(runTests PRIVATE gtest gtest_main dsa)
+target_link_libraries(runTests PRIVATE gtest gtest_main gmock gmock_main dsa)
 
 # Register the tests
 add_test(NAME runTests COMMAND runTests)
