@@ -6,7 +6,7 @@ A greedy algorithm obtains an optimal solution to a problem by making a sequence
 
 ## Designing greedy algorithms
 
-Greedy algorithms can typically be designed according to the following sequence of steps:
+Greedy algorithms are used to solve optimization problems, and can typically be designed according to the following sequence of steps:
 
 1.  Cast the optimization problem as one in which you make a choice and are left with one subproblem to solve.
 2.  Prove that there is always an optimal solution to the original problem that makes the greedy choice, so that the greedy choice is always safe.
