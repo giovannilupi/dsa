@@ -254,14 +254,20 @@ typename T::value_type selectMaxModern(T& container, std::size_t k) {
 
 /**
  * Returns the median of the container using the STL library's nth_element function.
- * This runs in linear time.
+ * Average complexity: O(n)
  */
-template <typename T>
-    requires SortableContainer<T, std::less<typename T::value_type>>
-typename T::value_type getMedian(T& container) {
+template <std::ranges::range T>
+    requires std::integral<std::ranges::range_value_t<T>>
+double getMedian(T& container) {
+    if (container.empty()) throw std::invalid_argument("Container is empty");
     auto sz = container.size();
-    if (sz & 1) return selectMinModern(container, sz / 2);
-    else return (selectMinModern(container, sz / 2) + selectMinModern(container, sz / 2 - 1)) / 2;
+    auto it1 = std::next(container.begin(), sz / 2);
+    std::nth_element(container.begin(), it1, container.end());
+    if (sz & 1) return *it1;
+    // Even length
+    auto it2 = std::next(container.begin(), sz / 2 - 1);
+    std::nth_element(container.begin(), it2, it1);
+    return static_cast<double>(*it1 + *it2) / 2.0;
 }
 
 } // namespace alg

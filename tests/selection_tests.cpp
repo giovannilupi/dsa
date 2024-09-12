@@ -56,20 +56,20 @@ static std::map<std::string, std::tuple<std::pair<std::vector<int>, std::size_t>
     {"AlternatingSigns", { { {-10, 10, -20, 20, -30, 30}, 3 }, 10, -10 }},
 };
 
-static std::map<std::string, std::pair<std::vector<int>, int>> testInputMedian = {
-    {"SingleElement", { {1}, 1 }},
-    {"TwoElementsEven", { {1, 2}, 1 }},
-    {"ThreeElementsOdd", { {1, 2, 3}, 2 }},
-    {"FourElementsEven", { {1, 2, 3, 4}, 2 }},
-    {"FiveElementsOdd", { {5, 1, 3, 2, 4}, 3 }},
-    {"AllPositive", { {10, 20, 30, 40, 50}, 30 }},
-    {"AllNegative", { {-10, -20, -30, -40, -50}, -30 }},
-    {"MixedValues", { {3, -1, 2, -2, 1}, 1 }},
-    {"LargeValues", { {100, 200, 300, 400, 500}, 300 }},
-    {"DecreasingSequence", { {9, 7, 5, 3, 1}, 5 }},
-    {"IncreasingSequence", { {1, 3, 5, 7, 9}, 5 }},
-    {"AlternatingSigns", { {10, -10, 20, -20, 30}, 10 }},
-    {"MultipleSameValues", { {1, 1, 1, 1, 1}, 1 }},
+static std::map<std::string, std::pair<std::vector<int>, double>> testInputMedian = {
+    {"SingleElement", { {1}, 1.0 }},
+    {"TwoElementsEven", { {1, 2}, 1.5 }},
+    {"ThreeElementsOdd", { {1, 2, 3}, 2.0 }},
+    {"FourElementsEven", { {1, 2, 3, 4}, 2.5 }},
+    {"FiveElementsOdd", { {5, 1, 3, 2, 4}, 3.0 }},
+    {"AllPositive", { {10, 20, 30, 40, 50}, 30.0 }},
+    {"AllNegative", { {-10, -20, -30, -40, -50}, -30.0 }},
+    {"MixedValues", { {3, -1, 2, -2, 1}, 1.0 }},
+    {"LargeValues", { {100, 200, 300, 400, 500}, 300.0 }},
+    {"DecreasingSequence", { {9, 7, 5, 3, 1}, 5.0 }},
+    {"IncreasingSequence", { {1, 3, 5, 7, 9}, 5.0 }},
+    {"AlternatingSigns", { {10, -10, 20, -20, 30}, 10.0 }},
+    {"MultipleSameValues", { {1, 1, 1, 1, 1}, 1.0 }},
 };
 
 class ExtremeValueTest :
@@ -92,7 +92,7 @@ class SelectionTest :
 
 class MedianTest :
     public ::testing::TestWithParam<std::pair<
-    const std::string, std::pair<std::vector<int>, int>>> 
+    const std::string, std::pair<std::vector<int>, double>>> 
 {};
 
 TEST_P(ExtremeValueTest, WorksWithAllInputs) {
