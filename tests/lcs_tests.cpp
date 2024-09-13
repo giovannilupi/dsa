@@ -10,7 +10,8 @@ using ::testing::ValuesIn;
 static std::map<std::string, LCSFunc> lcsFunctions = {
     {"LCSRecursive", alg::lcsRec<std::string>},
     {"LCSMemoization", alg::lcsMemoized<std::string>},
-    {"LCSTabulation", alg::lcsDP<std::string>},
+    {"LCSTabulated", alg::lcsDP<std::string>},
+    {"LCSTabulatedOptimized", alg::lcsDPOptimized<std::string>},
 };
 
 static std::map<std::string, std::pair<std::pair<std::string, std::string>, alg::index>> testStrings = {

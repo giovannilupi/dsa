@@ -11,7 +11,8 @@ using ::testing::ValuesIn;
 static std::map<std::string, KnapFunc> knapFunctions = {
     {"KnapsackRecursive", alg::knapsackRec<std::vector<int>>},
     {"KnapsackMemoized", alg::knapsackMemoized<std::vector<int>>},
-    {"KnapsackTabulation", alg::knapsackDP<std::vector<int>>}
+    {"KnapsackTabulated", alg::knapsackDP<std::vector<int>>},
+    {"KnapsackTabulatedOptimized", alg::knapsackDPOptimized<std::vector<int>>}
 };
 
 static std::map<std::string, std::pair<std::tuple<int, std::vector<int>, std::vector<int>>, int>> testCases = {

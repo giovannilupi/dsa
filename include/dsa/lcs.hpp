@@ -26,11 +26,11 @@ index lcsRecHelper(const T& c1, const T& c2, index i, index j) {
  */
 template <std::ranges::random_access_range T>
     requires std::equality_comparable<std::ranges::range_value_t<T>>
-index lcsMemoizedHelper(const T& c1, const T& c2, index i, index j, std::vector<std::vector<index>>& table) {
+index lcsMemoizedHelper(const T& c1, const T& c2, index i, index j, std::vector<std::vector<index>>& dp) {
     if (i == 0 || j == 0) return 0;
-    if (table[i][j] != -1) return table[i][j];
-    if (c1[i - 1] == c2[j - 1]) return table[i][j] = 1 + lcsMemoizedHelper(c1, c2, i - 1, j - 1, table);
-    return table[i][j] = std::max(lcsMemoizedHelper(c1, c2, i - 1, j, table), lcsMemoizedHelper(c1, c2, i, j - 1, table));
+    if (dp[i][j] != -1) return dp[i][j];
+    if (c1[i - 1] == c2[j - 1]) return dp[i][j] = 1 + lcsMemoizedHelper(c1, c2, i - 1, j - 1, dp);
+    return dp[i][j] = std::max(lcsMemoizedHelper(c1, c2, i - 1, j, dp), lcsMemoizedHelper(c1, c2, i, j - 1, dp));
 }
 
 } // namespace detail
@@ -56,14 +56,13 @@ template <std::ranges::random_access_range T>
 index lcsMemoized(const T& c1, const T& c2) {
     auto sz1 = c1.size();
     auto sz2 = c2.size();
-    std::vector<std::vector<index>> table(sz1 + 1, std::vector<index>(sz2 + 1, -1));
-    return detail::lcsMemoizedHelper(c1, c2, c1.size(), c2.size(), table);
+    std::vector<std::vector<index>> dp(sz1 + 1, std::vector<index>(sz2 + 1, -1));
+    return detail::lcsMemoizedHelper(c1, c2, c1.size(), c2.size(), dp);
 }
 
 /**
  * Returns the length of the longest common subsequence of two containers.
  * This uses bottom-up dynamic programming.
- * Notice we only need to store the last row of the table.
  * Complexity: O(n * m)
  */
 template <std::ranges::random_access_range T>
@@ -71,19 +70,41 @@ template <std::ranges::random_access_range T>
 index lcsDP(const T& c1, const T& c2) {
     auto sz1 = c1.size();
     auto sz2 = c2.size();
-    std::vector<index> table(sz2 + 1, 0);
+    std::vector<std::vector<index>> dp(sz1 + 1, std::vector<index>(sz2 + 1, 0));
     for (index i = 1; i <= sz1; ++i) {
-        // We may need to access table[j-1], which is overwritten by the previous iteration
+        for (index j = 1; j <= sz2; ++j) {
+            dp[i][j] = (c1[i - 1] == c2[j - 1]) 
+                ? 1 + dp[i - 1][j - 1]
+                : std::max(dp[i - 1][j], dp[i][j - 1]);
+        }
+    }
+    return dp[sz1][sz2];
+}
+
+/**
+ * Returns the length of the longest common subsequence of two containers.
+ * This uses a memory-optimized bottom-up dynamic programming.
+ * Notice we only need to store the last row of the table.
+ * Complexity: O(n * m)
+ */
+template <std::ranges::random_access_range T>
+    requires std::equality_comparable<std::ranges::range_value_t<T>>
+index lcsDPOptimized(const T& c1, const T& c2) {
+    auto sz1 = c1.size();
+    auto sz2 = c2.size();
+    std::vector<index> dp(sz2 + 1, 0);
+    for (index i = 1; i <= sz1; ++i) {
+        // We may need to access dp[j-1], which is overwritten by the previous iteration
         index prev = 0;
         for (index j = 1; j <= sz2; ++j) {
-            index curr = table[j];
-            table[j] = (c1[i - 1] == c2[j - 1]) 
+            index curr = dp[j];
+            dp[j] = (c1[i - 1] == c2[j - 1]) 
                 ? 1 + prev 
-                : std::max(table[j], table[j - 1]);
+                : std::max(dp[j], dp[j - 1]);
             prev = curr;
         }
     }
-    return table[sz2];
+    return dp[sz2];
 }
 
 } // namespace dsa

@@ -152,7 +152,7 @@ In the recursion tree, we notice that some problems are solved multiple times.
 
 ![aaa82cab302140ad349155f5e0bd53f6.png](../_resources/aaa82cab302140ad349155f5e0bd53f6.png)
 
-This means we can think of using memoization to store the result to each subproblem. In the recursion, there are two parameters that can change the result, which are $n$ and $m$. This means that, to store the result of each subproblem, we need a 2D array. We need the matrix to have $m+1$ rows and $n+1$ columns to include the empty string, which is a valid case for recursion. Each cell in the DP table represents a different chopping that we call this function on. For example the cell $DP[0][n+1]$ equates to the call $lcs("", "GXTXAYB")$.
+This means we can think of using memoization to store the result to each subproblem. In the recursion, there are two parameters that can change the result, which are $n$ and $m$. This means that, to store the result of each subproblem, we need a 2D array. We need the matrix to have $m+1$ rows and $n+1$ columns to include the empty string, which is a valid case for recursion. Each cell in the DP table represents a different chopping that we call this function on. For example the cell $DP[0][n+1]$ equates to the call $lcs("", "AGGTAB")$.
 
 ![c4e8f8f8a6ee2b33662ff343a1a88cd8.png](../_resources/c4e8f8f8a6ee2b33662ff343a1a88cd8.png)
 
@@ -178,7 +178,7 @@ The first step is to formulate a recursive solution by considering all possible 
 
 We need to consider all subsets whose total weight is smaller than the total capacity, and from them, pick the subset with the maximum profit. We obtain all subsets by considering two cases for each item:
 
-1.  The item is included in the subset. In this case, the subest has the value of the n$th$ items chosen plus the maximum value obtained by remaining $n-1$ items and remaining weight.
+1.  The item is included in the subset. In this case, the subset has the value of the n$th$ items chosen plus the maximum value obtained by remaining $n-1$ items and remaining weight.
 2.  The item is not included in the subset. Then, the subset value is equal to the maximum value obtained by $n-1$ items.
 
 ```C++
@@ -212,7 +212,7 @@ So, we can optimize the algorithm using memoization. We notice that the recursiv
 
 We can initialize the table with $-1$, and then add a case in the recursive algorithm to check if the cell with the given input size and capacity has already been filled. Only in the case it is not yet filled, we proceed with the recursive invocation.
 
-The last step is to find a wat to fill up the previously identified table row by row using iteration. The intuition here is that, given a cell, if the item has a weight greater than the current capacity, we cannot include it in our solution. We can however include in the solution all previous items that fit within the capacity. This equate to taking the value of $DP[i-1][j]$. Othwerwise, we have a choice: including the item or not. If we do not include the item, we must take $DP[i-1][j]$ as before. If we include the item instead, the value of the cell with be the value of the item we have just taken plus the best solution for the remaining capacity (excluding this item). Of course, we will make our choice depedending on which of the two solutions maximixe our value.
+The last step is to find a way to fill up the previously identified table row by row using iteration. The intuition here is that, given a cell, if the item has a weight greater than the current capacity, we cannot include it in our solution. We can however include in the solution all previous items that fit within the capacity. This equates to taking the value of $DP[i-1][j]$. Otherwise, we have a choice: including the item or not. If we do not include the item, we must take $DP[i-1][j]$ as before. If we include the item instead, the value of the cell will be the value of the item we have just taken plus the best solution for the remaining capacity (excluding this item). Of course, we will make our choice depending on which of the two solutions maximizes our value.
 
 ![b034d3b6a8d617c988e3adfcf0f788a8.png](../_resources/b034d3b6a8d617c988e3adfcf0f788a8.png)
 

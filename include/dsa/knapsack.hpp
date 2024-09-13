@@ -13,19 +13,22 @@ namespace detail {
 
 /**
  * Helper function for the naive recursive implementation of the knapsack algorithm.
+ * It proceeds backward from the last item to the first one.
+ * This simulates the classic problem formulation:
+ * to solve the problem for n items, we need to know the solution for n-1 items.
  */
 template <std::ranges::random_access_range TCont>
     requires std::signed_integral<std::ranges::range_value_t<TCont>>
 typename TCont::value_type knapsackRecHelper(typename TCont::value_type capacity, 
                                              const TCont& weights, 
                                              const TCont& values,
-                                             index idx) {
-    if (idx == 0 || capacity == 0) return 0;
+                                             index n) {
+    if (n == 0 || capacity == 0) return 0;
     // The weight is greater than the capacity, the item cannot be included
-    if (weights[idx - 1] > capacity) return knapsackRecHelper(capacity, weights, values, idx - 1);
+    if (weights[n - 1] > capacity) return knapsackRecHelper(capacity, weights, values, n - 1);
     // Maximum between this item included and not included
-    return std::max(values[idx - 1] + knapsackRecHelper(capacity - weights[idx - 1], weights, values, idx - 1), 
-                    knapsackRecHelper(capacity, weights, values, idx - 1));
+    return std::max(values[n - 1] + knapsackRecHelper(capacity - weights[n - 1], weights, values, n - 1), 
+                    knapsackRecHelper(capacity, weights, values, n - 1));
 }
 
 /**
@@ -36,13 +39,13 @@ template <std::ranges::random_access_range TCont>
 typename TCont::value_type knapsackMemoizedHelper(typename TCont::value_type capacity, 
                                                   const TCont& weights, 
                                                   const TCont& values,
-                                                  index idx,
-                                                  std::vector<std::vector<typename TCont::value_type>>& table) {
-    if (idx == 0 || capacity == 0) return 0;
-    if (table[idx][capacity] != -1) return table[idx][capacity];
-    if (weights[idx-1] > capacity) return table[idx][capacity] = knapsackMemoizedHelper(capacity, weights, values, idx - 1, table);
-    return table[idx-1][capacity] = std::max(values[idx-1] + knapsackMemoizedHelper(capacity - weights[idx-1], weights, values, idx - 1, table), 
-                                             knapsackMemoizedHelper(capacity, weights, values, idx - 1, table));
+                                                  index n,
+                                                  std::vector<std::vector<typename TCont::value_type>>& dp) {
+    if (n == 0 || capacity == 0) return 0;
+    if (dp[n][capacity] != -1) return dp[n][capacity];
+    if (weights[n-1] > capacity) return dp[n][capacity] = knapsackMemoizedHelper(capacity, weights, values, n - 1, dp);
+    return dp[n-1][capacity] = std::max(values[n-1] + knapsackMemoizedHelper(capacity - weights[n-1], weights, values, n - 1, dp), 
+                                             knapsackMemoizedHelper(capacity, weights, values, n - 1, dp));
 }
 
 } // namespace detail
@@ -74,14 +77,13 @@ typename TCont::value_type knapsackMemoized(typename TCont::value_type capacity,
                                             const TCont& values) {
     std::size_t sz = weights.size();
     if (sz != values.size()) throw std::invalid_argument("Weights and values have different sizes");
-    std::vector<std::vector<typename TCont::value_type>> table(sz+1, std::vector<typename TCont::value_type>(capacity + 1, -1));
-    return detail::knapsackMemoizedHelper(capacity, weights, values, sz, table);
+    std::vector<std::vector<typename TCont::value_type>> dp(sz+1, std::vector<typename TCont::value_type>(capacity + 1, -1));
+    return detail::knapsackMemoizedHelper(capacity, weights, values, sz, dp);
 }
 
 /**
  * Returns the maximum value that can be stored in the knapsack with the given capacity.
- * This uses bottom-up dynamic programming.
- * Notice we only need to store the last row of the table.
+ * This uses a bottom-up dynamic programming approach.
  * Complexity: O(n * capacity).
  */
 template <std::ranges::random_access_range TCont>
@@ -91,15 +93,43 @@ typename TCont::value_type knapsackDP(typename TCont::value_type capacity,
                                       const TCont& values) {
     std::size_t sz = weights.size();
     if (sz != values.size()) throw std::invalid_argument("Weights and values have different sizes");
-    std::vector<typename TCont::value_type> table(capacity + 1, 0);
+    std::vector<std::vector<typename TCont::value_type>> dp(sz+1, std::vector<typename TCont::value_type>(capacity + 1, 0));
     // Iterate over each item
-    for (std::size_t i = 0; i < sz; ++i) {
-        // Iterate backwards over the table row to avoid overwriting values we need
-        for (typename TCont::value_type w = capacity; w >= weights[i]; --w) {
-            table[w] = std::max(table[w], values[i] + table[w - weights[i]]);
+    for (std::size_t i = 1; i <= sz; ++i) {
+        // Iterate over each capacity
+        for (std::size_t j = 1; j <= capacity; ++j) {
+            dp[i][j] = (weights[i-1] > j)
+                // This item cannot be included
+                ? dp[i-1][j]
+                // Take the max between this item included and not included
+                : std::max(values[i-1] + dp[i-1][j - weights[i-1]], dp[i-1][j]);
         }
     }
-    return table[capacity];
+    return dp[sz][capacity];         
+}
+
+/**
+ * Returns the maximum value that can be stored in the knapsack with the given capacity.
+ * This uses a memory-optimized bottom-up dynamic programming approach.
+ * Notice we only need to store the last row of the table.
+ * Complexity: O(n * capacity).
+ */
+template <std::ranges::random_access_range TCont>
+    requires std::signed_integral<std::ranges::range_value_t<TCont>>
+typename TCont::value_type knapsackDPOptimized(typename TCont::value_type capacity, 
+                                               const TCont& weights, 
+                                               const TCont& values) {
+    std::size_t sz = weights.size();
+    if (sz != values.size()) throw std::invalid_argument("Weights and values have different sizes");
+    std::vector<typename TCont::value_type> dp(capacity + 1, 0);
+    // Iterate over each item
+    for (std::size_t i = 0; i < sz; ++i) {
+        // Iterate backwards over the dp row to avoid overwriting values we need
+        for (typename TCont::value_type w = capacity; w >= weights[i]; --w) {
+            dp[w] = std::max(dp[w], values[i] + dp[w - weights[i]]);
+        }
+    }
+    return dp[capacity];
 }
 
 /**
@@ -155,16 +185,16 @@ typename TCont::value_type knapsackUnbounded(typename TCont::value_type capacity
                                              const TCont& values) {
     std::size_t sz = weights.size();
     if (sz != values.size()) throw std::invalid_argument("Weights and values have different sizes");
-    std::vector<typename TCont::value_type> table(capacity + 1, 0);
+    std::vector<typename TCont::value_type> dp(capacity + 1, 0);
     // Iterate over each item
     for (std::size_t i = 1; i <= sz; ++i) {
         // Notice the order of traversal is opposite to the 0-1 knapsack
         for (std::size_t j = 1; j <= capacity; ++j) {
             // Compared to the 0-1 knapsack, if we pick an item we stay on its same row
-            if (weights[i - 1] <= j) table[j] = std::max(table[j], table[j - weights[i - 1]] + values[i - 1]);
+            if (weights[i - 1] <= j) dp[j] = std::max(dp[j], dp[j - weights[i - 1]] + values[i - 1]);
         }
     }
-    return table[capacity];
+    return dp[capacity];
 }
 
 } // namespace alg
