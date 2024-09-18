@@ -257,3 +257,19 @@ TEST(BinTreeTest, DiameterWorks) {
     EXPECT_EQ(getTreeDiameter(root), 3);
     deleteTree(root);
 }
+
+TEST(BinTreeTest, isHeightBalancedWorks) {
+    auto completeTree = createSimpleTree();
+    EXPECT_TRUE(isHeightBalanced(completeTree));
+    // Make the tree not balanced
+    auto newRoot = new TreeNode<int>(0, completeTree, nullptr);
+    EXPECT_FALSE(isHeightBalanced(newRoot));
+    deleteTree(newRoot);
+    auto notCompleteTree = createDegenerateTree();
+    EXPECT_FALSE(isHeightBalanced(notCompleteTree));
+    // Diff 1 between subtrees
+    auto node1 = new TreeNode<int>(1);
+    notCompleteTree->right = node1;
+    EXPECT_TRUE(isHeightBalanced(notCompleteTree));
+    deleteTree(notCompleteTree);
+}

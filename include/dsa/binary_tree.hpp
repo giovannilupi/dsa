@@ -56,19 +56,31 @@ std::size_t getTreeDiameterHelper(const TreeNode<T>* root, std::size_t& diameter
     return std::max(lHeight, rHeight) + 1;
 }
 
+/**
+ * Helper function for checking if the tree is height-balanced.
+ */
+template <typename T>
+int isHeightBalancedHelper(const TreeNode<T>* root, bool& balanced) {
+    if (!root || !balanced) return 0;
+    int lHeight = isHeightBalancedHelper(root->left, balanced);
+    int rHeight = isHeightBalancedHelper(root->right, balanced);
+    if (std::abs(lHeight - rHeight) > 1) balanced = false;
+    return std::max(lHeight, rHeight) + 1;
+}
+
 } // namespace detail
 
 /**
  * Callback function to be applied to each node of a tree.
  */
 template <typename T>
-using Callback = std::function<void(T&)>;
+using TCallback = std::function<void(T&)>;
 
 /**
  * Applies a function to each node of a tree in DFS pre-order traversal.
  */
 template <typename T>
-void preorderTreeApply(TreeNode<T>* root, Callback<T> func) {
+void preorderTreeApply(TreeNode<T>* root, TCallback<T> func) {
     if (root) {
         func(root->val);
         preorderTreeApply(root->left, func);
@@ -80,7 +92,7 @@ void preorderTreeApply(TreeNode<T>* root, Callback<T> func) {
  * Applies a function to each node of a tree in DFS in-order traversal.
  */
 template <typename T>
-void inorderTreeApply(TreeNode<T>* root, Callback<T> func) {
+void inorderTreeApply(TreeNode<T>* root, TCallback<T> func) {
     if (root) {
         inorderTreeApply(root->left, func);
         func(root->val);
@@ -92,7 +104,7 @@ void inorderTreeApply(TreeNode<T>* root, Callback<T> func) {
  * Applies a function to each node of a tree in DFS post-order traversal.
  */
 template <typename T>
-void postorderTreeApply(TreeNode<T>* root, Callback<T> func) {
+void postorderTreeApply(TreeNode<T>* root, TCallback<T> func) {
     if (root) {
         postorderTreeApply(root->left, func);
         postorderTreeApply(root->right, func);
@@ -104,14 +116,14 @@ void postorderTreeApply(TreeNode<T>* root, Callback<T> func) {
  * Applies a function to each node of a tree in BFS level-order traversal.
  */
 template <typename T>
-void bfsTreeApply(TreeNode<T>* root, Callback<T> func) {
+void bfsTreeApply(TreeNode<T>* root, TCallback<T> func) {
     if (!root) return;
     std::queue<TreeNode<T>*> child_queue;
     child_queue.push(root);
     while (!child_queue.empty()) {
         TreeNode<T>* node = child_queue.front();
-        func(node->val);
         child_queue.pop();
+        func(node->val);
         if (node->left) child_queue.push(node->left);
         if (node->right) child_queue.push(node->right);
     }    
@@ -214,6 +226,17 @@ void deleteTree(const TreeNode<T>* root) {
         deleteTree(root->right);
         delete(root);
     }
+}
+
+/**
+ * Checks if a binary tree is height balanced.
+ * The depth of the two subtrees of every node should never differ by more than one.
+ */
+template <typename T>
+bool isHeightBalanced(const TreeNode<T>* root) {
+    bool balanced = true;
+    detail::isHeightBalancedHelper(root, balanced);
+    return balanced;
 }
 
 /**
