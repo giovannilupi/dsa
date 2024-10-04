@@ -203,7 +203,7 @@ TEST(BSTTest, ToBSTWorks) {
     EXPECT_TRUE(checkBST(tree));
 }
 
-TEST(LCATest, FindLowestCommonAncestorInBST) {
+TEST(LCATest, LowestCommonAncestorWorks) {
     // Tree structure:
     //        6
     //       / \

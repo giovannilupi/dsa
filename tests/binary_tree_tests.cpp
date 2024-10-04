@@ -219,7 +219,7 @@ TEST(BinTreeTest, NodeLevelWorks) {
     deleteTree(root);
 }
 
-TEST(BinTreeTest, LeastCommonAncestorWorks) {
+TEST(BinTreeTest, LowestCommonAncestorWorks) {
     // Construct the following tree
     //        0
     //       / \

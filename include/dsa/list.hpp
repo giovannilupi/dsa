@@ -105,7 +105,7 @@ SListNode<T>* insertList(SListNode<T>* head, std::size_t pos, const T& val) {
     }
     // Insert the element
     SListNode<T>* new_node = new SListNode<T>(val, curr);
-    // Hanlde empty list
+    // Handle empty list
     if (!prev) return new_node;
     prev->next = new_node;
     return head;
