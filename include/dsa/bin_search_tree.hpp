@@ -222,4 +222,20 @@ const TreeNode<T>* getBSTKthMin(const TreeNode<T>* root, std::size_t k) {
     return detail::getBSTKthMinHelper(root, k);
 }
 
+/**
+ * Finds the lowest common ancestor of two nodes in a binary search tree.
+ * This uses an iterative loop.
+ */
+template <typename T>
+const TreeNode<T>* lcaBST(const TreeNode<T>* root, const TreeNode<T>* n1, const TreeNode<T>* n2) {
+    while (root) {
+        // If the root has value less than both nodes, go left
+        if (root->val > n1->val && root->val > n2->val) root = root->left;
+        // If the root has value greater than both nodes, go right
+        else if (root->val < n1->val && root->val < n2->val) root = root->right;
+        else break;
+    }
+    return root;
+}
+
 } // namespace alg

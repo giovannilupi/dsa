@@ -202,3 +202,35 @@ TEST(BSTTest, ToBSTWorks) {
     EXPECT_TRUE(checkEqualTrees(tree, expected));
     EXPECT_TRUE(checkBST(tree));
 }
+
+TEST(LCATest, FindLowestCommonAncestorInBST) {
+    // Tree structure:
+    //        6
+    //       / \
+    //      4   8
+    //     / \   \
+    //    3   5   9
+    // Create a binary search tree manually
+    TreeNode<int>* root = new TreeNode<int>(6);
+    TreeNode<int>* fourNode = root->left = new TreeNode<int>(4);
+    TreeNode<int>* eightNode = root->right = new TreeNode<int>(8);
+    TreeNode<int>* threeNode = fourNode->left = new TreeNode<int>(3);
+    TreeNode<int>* fiveNode = fourNode->right = new TreeNode<int>(5);
+    TreeNode<int>* nineNode = eightNode->right = new TreeNode<int>(9);
+
+    // LCA of 4 and 8 is 6
+    auto lca = lcaBST(root, fourNode, eightNode); 
+    EXPECT_EQ(lca->val, 6);
+    // LCA of 3 and 5 is 4
+    lca = lcaBST(root, root->left->left, root->left->right); 
+    EXPECT_EQ(lca->val, 4); 
+    // LCA of 4 and 5 is 4
+    lca = lcaBST(root, root->left, root->left->right); 
+    EXPECT_EQ(lca->val, 4);
+    // LCA of 8 and 9 is 8
+    lca = lcaBST(root, root->right, root->right->right); 
+    EXPECT_EQ(lca->val, 8);
+
+    // Clean up
+    deleteTree(root);
+}
