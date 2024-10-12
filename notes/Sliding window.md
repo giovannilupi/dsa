@@ -54,7 +54,7 @@ int minSubArrayLen(int target, const std::vector<int>& nums) {
     int left = 0;
 
     for (int right = 0; right < nums.size(); ++right) {
-             // Expand the window by moving the right pointer
+        // Expand the window by moving the right pointer
         currentSum += nums[right];  
         // Shrink the window until the condition is no longer met
         while (currentSum >= target) {
