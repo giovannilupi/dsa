@@ -1,9 +1,12 @@
 #include <gtest/gtest.h>
+#include <format>
 #include "union_find.hpp"
 
-using namespace alg;
+using alg::UnionFind;
+using ::testing::TestWithParam;
+using ::testing::Values;
 
-class UnionFindTest : public ::testing::TestWithParam<int> {};
+class UnionFindTest : public TestWithParam<int> {};
 
 TEST_P(UnionFindTest, InitializationWorks) {
     int n = GetParam();
@@ -27,11 +30,6 @@ TEST_P(UnionFindTest, UniteAndFindWork) {
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    UnionFindTestsGenerator, 
-    UnionFindTest, 
-    ::testing::Values(0, 1, 2, 5, 10, 100),
-    [](const testing::TestParamInfo<int>& info) {
-        return "Size_" + std::to_string(info.param);
-    }
-);
+INSTANTIATE_TEST_SUITE_P(UnionFindTestsGenerator, UnionFindTest, 
+    Values(0, 1, 2, 5, 10, 100),
+    [](const auto& info) { return std::format("Size_{}", std::to_string(info.param)); });

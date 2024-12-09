@@ -2,13 +2,17 @@
 #include <vector>
 #include "trie.hpp"
 
-using namespace alg;
+using alg::Trie;
+
+namespace {
+
+const std::vector<std::string> words = {"apple", "app", "banana", "bat"};
+
+} // namespace
 
 class TrieTest : public ::testing::Test {
 protected:
     Trie trie;
-    inline static const std::vector<std::string> words = 
-        {"apple", "app", "banana", "bat"};
 
     void SetUp() override {
         for (const auto& word : words) 

@@ -25,7 +25,7 @@ class Trie {
      * It marks the end of word flag to false for the word to be removed.
      * Then, it recursively removes unused nodes, if any.
      */
-    bool removeHelper(TrieNode* node, const std::string& word, int depth) {
+    bool removeHelper(TrieNode* node, const std::string& word, const int depth) {
         // Reached end of word
         if (depth == word.size()) {
             // Word not found, nothing to delete
@@ -49,8 +49,8 @@ class Trie {
     /**
      * Deletes the Trie recursively.
      */
-    void deleteTrie(TrieNode* node) {
-        for (auto& child : node->children) {
+    void deleteTrie(const TrieNode* node) {
+        for (const auto& child : node->children) {
             deleteTrie(child.second);
         }
         delete node;
@@ -70,7 +70,7 @@ public:
      */
     void insert(const std::string& word) {
         TrieNode* node = root;
-        for (char c : word) {
+        for (const char c : word) {
             if (!node->children.count(c)) {
                 node->children[c] = new TrieNode();
             }
@@ -85,7 +85,7 @@ public:
      */
     bool search(const std::string& word) {
         TrieNode* node = root;
-        for (char c : word) {
+        for (const char c : word) {
             if (!node->children.count(c)) return false;
             node = node->children[c];
         }
@@ -98,7 +98,7 @@ public:
      */
     bool startsWith(const std::string& prefix) {
         TrieNode* node = root;
-        for (char c : prefix) {
+        for (const char c : prefix) {
             if (!node->children.count(c)) return false;
             node = node->children[c];
         }
