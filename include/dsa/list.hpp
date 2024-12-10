@@ -94,7 +94,7 @@ void printList(SListNode<T>* head) {
  * If the position is out of bounds, the element is inserted at the end.
  */
 template <typename T>
-SListNode<T>* insertList(SListNode<T>* head, std::size_t pos, const T& val) {
+SListNode<T>* insertList(SListNode<T>* head, const std::size_t pos, const T& val) {
     SListNode<T>* prev = nullptr;
     SListNode<T>* curr = head;
     index cpos = pos;
@@ -132,7 +132,7 @@ SListNode<T>* insertListBack(SListNode<T>* head, const T& val) {
  * If the position is out of bounds, no element is removed.
  */
 template <typename T>
-SListNode<T>* removeList(SListNode<T>* head, std::size_t pos) {
+SListNode<T>* removeList(SListNode<T>* head, const std::size_t pos) {
     SListNode<T>* curr = head;
     SListNode<T>* prev = nullptr;
     index cpos = pos;
