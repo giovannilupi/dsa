@@ -53,4 +53,3 @@ TEST(ModuloTests, ThrowsWithInvalidDivisor) {
     EXPECT_THROW(alg::mod(10, 0), std::invalid_argument);
     EXPECT_THROW(alg::mod(10, -5), std::invalid_argument);
 }
-

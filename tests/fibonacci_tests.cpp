@@ -4,20 +4,27 @@
 #include <functional> 
 #include "fibonacci.hpp"
 
+using ::testing::TestWithParam;
+using ::testing::ValuesIn;
+
+namespace {
+
 using FibFunc = std::function<uint64_t(uint64_t)>;
 
-static std::map<std::string, FibFunc> fibonacciFunctions = {
+const std::map<std::string, FibFunc> fibonacciFunctions = {
     {"FibonacciRecursive", alg::fibRec},
     {"FibonacciTailRecursive", alg::fibTailRec},
     {"FibonacciIterative", alg::fibIter},
 };
 
-class FibonacciTest : 
-    public ::testing::TestWithParam<std::pair<const std::string, FibFunc>> 
-{};
+} // namespace
+
+using FibTestParamT = decltype(fibonacciFunctions)::value_type;
+
+class FibonacciTest : public TestWithParam<FibTestParamT> {};
 
 TEST_P(FibonacciTest, WorksWithAllInputs) {
-    auto fibFunc = GetParam().second;
+    const auto& fibFunc = GetParam().second;
 
     EXPECT_EQ(fibFunc(0), 0);
     EXPECT_EQ(fibFunc(1), 1);
@@ -43,7 +50,5 @@ TEST_P(FibonacciTest, WorksWithAllInputs) {
 }
 
 INSTANTIATE_TEST_SUITE_P(FibonacciTestsGenerator, FibonacciTest, 
-    ::testing::ValuesIn(fibonacciFunctions),
-    [](const testing::TestParamInfo<FibonacciTest::ParamType> &info){
-        return info.param.first;
-    });
+    ValuesIn(fibonacciFunctions),
+    [](const auto& info) { return info.param.first; });

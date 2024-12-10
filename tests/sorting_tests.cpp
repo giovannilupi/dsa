@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <string>
+#include <format>
 #include <vector>
 #include <functional> 
 #include "insertionsort.hpp"
@@ -10,11 +11,15 @@
 #include "heapsort.hpp"
 #include "quicksort.hpp"
 
-using SortFunc = std::function<void(std::vector<int>&)>;
+using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-static std::map<std::string, SortFunc> sortingFunctions = {
+namespace {
+
+using SortFunc = std::function<void(std::vector<int>&)>;
+
+const std::map<std::string, SortFunc> sortingFunctions = {
     {"InsertionSort", alg::insertionSort<std::vector<int>>},
     {"InsertionSortModern", alg::insertionSortModern<std::vector<int>>},
     {"SelectionSort", alg::selectionSort<std::vector<int>>},
@@ -27,7 +32,7 @@ static std::map<std::string, SortFunc> sortingFunctions = {
     {"QuickSortCoarse", alg::quickSortCoarse<std::vector<int>>},
 };
 
-static std::map<std::string, std::vector<int>> testVectors = {
+const std::map<std::string, std::vector<int>> testVectors = {
     {"Sorted", {1, 2, 3, 4, 5}},
     {"Unsorted", {5, 3, 1, 4, 2}},
     {"Empty", {}},
@@ -38,16 +43,16 @@ static std::map<std::string, std::vector<int>> testVectors = {
     {"LargeValues", {2147483647, 2147483646, 2147483645, 2147483644, 2147483643, 2147483642, 2147483641}},
 };
 
-class SortingTest :
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, SortFunc>,
-    std::pair<const std::string, std::vector<int>>>> 
-{};
+} // namespace
+
+using SortingTestParamT = std::tuple<decltype(sortingFunctions)::value_type, decltype(testVectors)::value_type>;
+
+class SortingTest : public TestWithParam<SortingTestParamT> {};
 
 TEST_P(SortingTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto sortFunc = std::get<0>(param).second;
+    const auto& param = GetParam();
+    const auto& sortFunc = std::get<0>(param).second;
     auto container = std::get<1>(param).second;
     auto expected = container;
     // Sort the containers
@@ -59,6 +64,6 @@ TEST_P(SortingTest, WorksWithAllInputs) {
 
 INSTANTIATE_TEST_SUITE_P(SortingTestsGenerator, SortingTest,
     Combine(ValuesIn(sortingFunctions), ValuesIn(testVectors)),
-    [](const testing::TestParamInfo<SortingTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
+    [](const auto& info) {
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });

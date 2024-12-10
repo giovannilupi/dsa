@@ -4,20 +4,27 @@
 #include <functional> 
 #include "factorial.hpp"
 
+using ::testing::TestWithParam;
+using ::testing::ValuesIn;
+
+namespace {
+
 using FactFunc = std::function<uint64_t(uint64_t)>;
 
-static std::map<std::string, FactFunc> factorialFunctions = {
+const std::map<std::string, FactFunc> factorialFunctions = {
     {"FactorialRecursive", alg::factRec},
     {"FactorialTailRecursive", alg::factTailRec},
     {"FactorialIterative", alg::factIter},
 };
 
-class FactorialTest : 
-    public ::testing::TestWithParam<std::pair<const std::string, FactFunc>>
-{};
+} // namespace
+
+using FactTestParamT = decltype(factorialFunctions)::value_type;
+
+class FactorialTest : public TestWithParam<FactTestParamT> {};
 
 TEST_P(FactorialTest, WorksWithAllInputs) {
-    auto factorialFunction = GetParam().second;
+    const auto& factorialFunction = GetParam().second;
     
     EXPECT_EQ(factorialFunction(0), 1);
     EXPECT_EQ(factorialFunction(1), 1);
@@ -35,7 +42,5 @@ TEST_P(FactorialTest, WorksWithAllInputs) {
 }
 
 INSTANTIATE_TEST_SUITE_P(FactorialTestsGenerator, FactorialTest, 
-    ::testing::ValuesIn(factorialFunctions),
-    [](const testing::TestParamInfo<FactorialTest::ParamType> &info){
-        return info.param.first;
-    }); 
+    ValuesIn(factorialFunctions),
+    [](const auto& info) { return info.param.first; }); 

@@ -1,17 +1,27 @@
 #include <gtest/gtest.h>
 #include <vector>
+#include <format>
 #include "palindrome.hpp"
 
-using PalindromFunc = std::function<bool(std::vector<int>&)>;
+using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-static std::map<std::string, PalindromFunc> palindromeFunctions = {
+namespace {
+
+using PalindromFunc = std::function<bool(const std::vector<int>&)>;
+
+const std::map<std::string, PalindromFunc> palindromeFunctions = {
     {"IsPalindromeRecursive", alg::isPalindromeRec<std::vector<int>>},
     {"IsPalindromeIterative", alg::isPalindromeIter<std::vector<int>>}
 };
 
-static std::map<std::string, std::pair<std::vector<int>, bool>> testVectors = {
+struct TestPalindromeInput {
+    const std::vector<int> input;
+    const bool expected;
+};
+
+const std::map<std::string, TestPalindromeInput> testVectors = {
     {"Empty", { {}, true} },
     {"OneElement", { {1}, true} },
     {"TwoElementsSame", { {1, 1}, true} },
@@ -45,26 +55,23 @@ static std::map<std::string, std::pair<std::vector<int>, bool>> testVectors = {
         10, 9, 8, 7, 6, 5, 4, 3, 2, 1 }, true} }
 };
 
-class PalindromeTest : 
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, PalindromFunc>,
-    std::pair<const std::string, std::pair<std::vector<int>, bool>>>>
-{};
+} // namespace
+
+using PalindromeTestParamT = std::tuple<decltype(palindromeFunctions)::value_type, decltype(testVectors)::value_type>;
+
+class PalindromeTest : public TestWithParam<PalindromeTestParamT> {};
 
 TEST_P(PalindromeTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto palindromeFunction = std::get<0>(param).second;
-    auto testInput = std::get<1>(param).second;
-    auto container = testInput.first;
-    auto expected = testInput.second;
+    const auto& param = GetParam();
+    const auto& palindromeFunction = std::get<0>(param).second;
+    const auto& [container, expected] = std::get<1>(param).second;
     // Check if the container is a palindrome
     EXPECT_EQ(palindromeFunction(container), expected);
 }
 
-
 INSTANTIATE_TEST_SUITE_P(PalindromeTestsGenerator, PalindromeTest,
     Combine(ValuesIn(palindromeFunctions), ValuesIn(testVectors)),
-    [](const testing::TestParamInfo<PalindromeTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
+    [](const auto& info) { 
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });

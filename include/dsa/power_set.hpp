@@ -88,7 +88,7 @@ template <std::ranges::forward_range T>
 std::vector<std::vector<typename T::value_type>> powerSetIter(const T& container) {
     std::vector<std::vector<typename T::value_type>> res = {{}};
     for (const auto& el : container) {
-        std::size_t sz = res.size();
+        const std::size_t sz = res.size();
         for (std::size_t i = 0; i != sz; ++i) {
             res.push_back(res[i]);
             res.back().push_back(el);

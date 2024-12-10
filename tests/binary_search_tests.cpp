@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <format>
 #include <algorithm>
 #include <tuple>
 #include <vector>
@@ -7,31 +8,34 @@
 #include <iterator>
 #include "binary_search.hpp"
 
-// Type alias for the binary search functions with index return type
-using BSearchIdxFunc = std::function<int(const std::vector<int>&, const int&)>;
-
-// Type alias for the binary search functions with iterator return type
-using BSearchIterFunc = std::function<std::vector<int>::const_iterator(const std::vector<int>&, const int&)>;
-
-// Type alias for the binary search on a matrix
-using BSearchMatrixFunc = std::function<std::pair<int, int>(const std::vector<std::vector<int>>& matrix, const int& target)>;
-
+using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-static std::map<std::string, BSearchIdxFunc> idxBSearchFunctions = {
+namespace {
+
+using BSearchIdxFunc = std::function<int(const std::vector<int>&, const int&)>;
+using BSearchIterFunc = std::function<std::vector<int>::const_iterator(const std::vector<int>&, const int&)>;
+
+const std::map<std::string, BSearchIdxFunc> idxBSearchFunctions = {
     {"BSearchIdxIterative", alg::bsearch<std::vector<int>>},
     {"BSearchIdxRecursive", alg::bSearchRec<std::vector<int>>}
 };
 
-static std::map<std::string, BSearchIterFunc> iterBSearchFunctions = {
+const std::map<std::string, BSearchIterFunc> iterBSearchFunctions = {
     {"BSearchSTLContainer", alg::bSearchLib<std::vector<int>>},
-    {"BSearchSTLIterators", [](const std::vector<int>& container, const int& val) {
+    {"BSearchSTLIterators", [](const auto& container, int val) {
         return alg::bSearchLibIt(container.cbegin(), container.cend(), val);
     }}
 };
 
-static std::map<std::string, std::tuple<std::vector<int>, int, int>> testVectors = {
+struct TestVectInput {
+    const std::vector<int> container;
+    const int val;
+    const int expected;
+};
+
+const std::map<std::string, TestVectInput> testVectors = {
     {"EmptyContainer", {
         {}, 
         0, 
@@ -64,7 +68,13 @@ static std::map<std::string, std::tuple<std::vector<int>, int, int>> testVectors
     }}
 };
 
-static std::map<std::string, std::tuple<std::vector<std::vector<int>>, int, std::pair<int, int>>> testMatrices = {
+struct TestMatrixInput {
+    const std::vector<std::vector<int>> matrix;
+    const int target;
+    const std::pair<int, int> expected;
+};
+
+const std::map<std::string, TestMatrixInput> testMatrices = {
     {"EmptyMatrix", {{{}}, 1, {-1, -1}}},
     {"SingleElementMatrix", {{{1}}, 1, {0, 0}}},
     {"SingleElementNotFound", {{{1}}, 2, {-1, -1}}},
@@ -76,74 +86,61 @@ static std::map<std::string, std::tuple<std::vector<std::vector<int>>, int, std:
     {"SingleColumnFound", {{{1}, {3}, {5}, {7}, {9}}, 5, {2, 0}}},
 };
 
-class BSearchIndexTest : 
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, BSearchIdxFunc>,
-    std::pair<const std::string, std::tuple<std::vector<int>, int, int>>>>
-{};
+} // namespace
 
-class BSearchIteratorTest : 
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, BSearchIterFunc>,
-    std::pair<const std::string, std::tuple<std::vector<int>, int, int>>>>
-{};
+using BSearchIdxTestParamT = std::tuple<decltype(idxBSearchFunctions)::value_type, decltype(testVectors)::value_type>;
 
-class BSearchMatrixTest : 
-    public ::testing::TestWithParam<std::pair<
-    const std::string, std::tuple<std::vector<std::vector<int>>, int, std::pair<int, int>>>>
-{};
+class BSearchIndexTest : public TestWithParam<BSearchIdxTestParamT> {};
 
 TEST_P(BSearchIndexTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto bSearchFunc = std::get<0>(param).second;
-    auto testInput = std::get<1>(param).second;
-    auto container = std::get<0>(testInput);
-    auto val = std::get<1>(testInput);
-    auto expected = std::get<2>(testInput);
+    const auto& param = GetParam();
+    const auto& bSearchFunc = std::get<0>(param).second;
+    const auto& testInput = std::get<1>(param).second;
+    const auto& [container, val, expected] = std::get<1>(param).second;
 
     EXPECT_EQ(bSearchFunc(container, val), expected);
 }
 
+INSTANTIATE_TEST_SUITE_P(BSearchIdxTestsGenerator, BSearchIndexTest, 
+    Combine(ValuesIn(idxBSearchFunctions), ValuesIn(testVectors)),
+    [](const auto& info) { 
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
+    });
+
+using BSearchIterTestParamT = std::tuple<decltype(iterBSearchFunctions)::value_type, decltype(testVectors)::value_type>;
+
+class BSearchIteratorTest : public TestWithParam<BSearchIterTestParamT> {};
+
 TEST_P(BSearchIteratorTest, SearchTests) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto bSearchFunc = std::get<0>(param).second;
-    auto testInput = std::get<1>(param).second;
-    auto container = std::get<0>(testInput);
-    auto val = std::get<1>(testInput);
-    auto expectedIdx = std::get<2>(testInput);
-    auto expectedIter = (expectedIdx == -1)
+    const auto& param = GetParam();
+    const auto& bSearchFunc = std::get<0>(param).second;
+    const auto& [container, val, expectedIdx] = std::get<1>(param).second;
+    const auto expectedIter = (expectedIdx == -1)
                             ? container.cend() 
                             : std::next(container.cbegin(), expectedIdx);
 
     EXPECT_EQ(bSearchFunc(container, val), expectedIter);
 }
 
+INSTANTIATE_TEST_SUITE_P(BSearchIterTestsGenerator, BSearchIteratorTest, 
+    Combine(ValuesIn(iterBSearchFunctions), ValuesIn(testVectors)),
+    [](const auto& info) { 
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
+    });
+
+using BSearchMatrixTestParamT = decltype(testMatrices)::value_type;
+
+class BSearchMatrixTest : public TestWithParam<BSearchMatrixTestParamT> {};
+
 TEST_P(BSearchMatrixTest, SearchTests) {
     // Get the parameters for the current test case
-    auto param = GetParam().second;
-    auto matrix = std::get<0>(param);
-    auto val = std::get<1>(param);
-    auto expected = std::get<2>(param);
+    const auto& [matrix, val, expected] = GetParam().second;
 
     EXPECT_EQ(alg::bsearchMatrix(matrix, val), expected);
 }
 
-INSTANTIATE_TEST_SUITE_P(BSearchIdxTestsGenerator, BSearchIndexTest, 
-    Combine(ValuesIn(idxBSearchFunctions), ValuesIn(testVectors)),
-    [](const testing::TestParamInfo<BSearchIndexTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
-    });
-
-INSTANTIATE_TEST_SUITE_P(BSearchIterTestsGenerator, BSearchIteratorTest, 
-    Combine(ValuesIn(iterBSearchFunctions), ValuesIn(testVectors)),
-    [](const testing::TestParamInfo<BSearchIteratorTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
-    });
-
 INSTANTIATE_TEST_SUITE_P(BSearchMatrixTestsGenerator, BSearchMatrixTest,
-    ::testing::ValuesIn(testMatrices),
-    [](const testing::TestParamInfo<BSearchMatrixTest::ParamType>& info) {
-        return std::get<0>(info.param);
-    });
+    ValuesIn(testMatrices),
+    [](const auto& info) { return info.param.first; });

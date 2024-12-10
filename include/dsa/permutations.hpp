@@ -40,7 +40,7 @@ template<std::ranges::range TCont>
 std::vector<std::vector<typename TCont::value_type>> permutations(const TCont& container) {
     using T = typename TCont::value_type;
     std::vector<std::vector<T>> res;
-    std::vector<T> vec(container.begin(), container.end());
+    std::vector<T> vec(container.cbegin(), container.cend());
     detail::permutationsHelper(vec, res, 0);
     return res;
 }

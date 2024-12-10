@@ -1,38 +1,48 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <vector>
 #include "permutations.hpp"
 
-static std::map<std::string, std::pair<std::vector<int>, std::vector<std::vector<int>>>> testCases = {
-    {"EmptyInput", {{}, {{}}}},
-    {"SingleElement", {{1}, {{1}}}},
-    {"TwoElements", {{1, 2}, {{1, 2}, {2, 1}}}},
-    {"ThreeElements", {{1, 2, 3}, {{1, 2, 3}, {1, 3, 2}, {2, 1, 3}, {2, 3, 1}, {3, 1, 2}, {3, 2, 1}}}},
-    {"DuplicateElements", {{1, 1}, {{1, 1}, {1, 1}}}},
-    {"FourElements", {{1, 2, 3, 4}, {
-        {1, 2, 3, 4}, {1, 2, 4, 3}, {1, 3, 2, 4}, {1, 3, 4, 2}, {1, 4, 2, 3}, {1, 4, 3, 2},
-        {2, 1, 3, 4}, {2, 1, 4, 3}, {2, 3, 1, 4}, {2, 3, 4, 1}, {2, 4, 1, 3}, {2, 4, 3, 1},
-        {3, 1, 2, 4}, {3, 1, 4, 2}, {3, 2, 1, 4}, {3, 2, 4, 1}, {3, 4, 1, 2}, {3, 4, 2, 1},
-        {4, 1, 2, 3}, {4, 1, 3, 2}, {4, 2, 1, 3}, {4, 2, 3, 1}, {4, 3, 1, 2}, {4, 3, 2, 1}
-    }}},
+using ::testing::TestWithParam;
+
+namespace {
+
+auto genPermutations = [](std::vector<int> vec) {
+    std::vector<std::vector<int>> permutations;
+    std::sort(vec.begin(), vec.end());
+    do {
+        permutations.push_back(vec);
+    } while (std::next_permutation(vec.begin(), vec.end()));
+    return permutations;
 };
 
-class PermutationsTest : 
-    public ::testing::TestWithParam<std::pair<
-    const std::string, std::pair<std::vector<int>, std::vector<std::vector<int>>>>> 
-{};
+struct TestPermutationsInput {
+    const std::vector<int> input;
+    const std::vector<std::vector<int>> expected;
+};
 
+const std::map<std::string, TestPermutationsInput> testCases = {
+    {"EmptyInput", {{}, genPermutations({})}},
+    {"SingleElement", {{1}, genPermutations({1})}},
+    {"TwoElements", {{1, 2}, genPermutations({1, 2})}},
+    {"ThreeElements", {{1, 2, 3}, genPermutations({1, 2, 3})}},
+    // next_permutation from std lib skips duplicate elements, so can't be used for this case
+    {"DuplicateElements", {{1, 1}, {{1, 1}, {1, 1}}}},
+    {"FourElements", {{1, 2, 3, 4}, genPermutations({1, 2, 3, 4})}},
+};
+
+} // namespace
+
+using PermutationsTestParamT = decltype(testCases)::value_type;
+
+class PermutationsTest : public TestWithParam<PermutationsTestParamT> {};
 
 TEST_P(PermutationsTest, TestPermutations) {
-    auto param = GetParam();
-    auto vec = param.second.first;
-    auto expected = param.second.second;
+    const auto& [vec, expected] = GetParam().second;
     // Ignore the order of the elements in the comparison
-    auto res = alg::permutations(vec);
-    EXPECT_THAT(res, ::testing::UnorderedElementsAreArray(expected));
+    EXPECT_THAT(alg::permutations(vec), ::testing::UnorderedElementsAreArray(expected));
 }
 
 INSTANTIATE_TEST_SUITE_P(PermutationsTestsGenerator, PermutationsTest,
     ::testing::ValuesIn(testCases),
-    [](const testing::TestParamInfo<PermutationsTest::ParamType>& info) {
-        return std::get<0>(info.param); // Return the description as the test name
-    });
+    [](const auto& info) { return info.param.first; });

@@ -2,7 +2,15 @@
 #include <gmock/gmock.h>
 #include "n_queens.hpp"
 
-static std::map<std::string, std::pair<int, std::vector<std::vector<int>>>> testCases = {
+using ::testing::TestWithParam;
+using ::testing::UnorderedElementsAreArray;
+using ::testing::ValuesIn;
+
+namespace {
+
+using Board = std::vector<std::vector<int>>;
+
+const std::map<std::string, std::pair<int, Board>> testCases = {
     {"OneQueen", {1, {{0}}}},
     {"TwoQueens", {2, {}}},
     {"ThreeQueens", {3,{}}},
@@ -13,21 +21,19 @@ static std::map<std::string, std::pair<int, std::vector<std::vector<int>>>> test
     {4, 1, 3, 0, 2}, {4, 2, 0, 3, 1}}}},
 };
 
-class NQueensTest : 
-    public ::testing::TestWithParam<std::pair<const std::string, std::pair<int, std::vector<std::vector<int>>>>>
-{};
+} // namespace
+
+using NQueensTestParam = decltype(testCases)::value_type;
+
+class NQueensTest : public TestWithParam<NQueensTestParam> {};
 
 TEST_P(NQueensTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto n = std::get<1>(param).first;
-    auto expected = std::get<1>(param).second;
+    const auto& [n, expected] = GetParam().second;
     // Check if the board is valid
-    EXPECT_THAT(alg::nQueens(n), ::testing::UnorderedElementsAreArray(expected));
+    EXPECT_THAT(alg::nQueens(n), UnorderedElementsAreArray(expected));
 }
 
 INSTANTIATE_TEST_SUITE_P(NQueensTestsGenerator, NQueensTest,
-    ::testing::ValuesIn(testCases),
-    [](const testing::TestParamInfo<NQueensTest::ParamType>& info) {
-        return std::get<0>(info.param); // Return the description as the test name
-    });
+    ValuesIn(testCases),
+    [](const auto& info) { return info.param.first; });

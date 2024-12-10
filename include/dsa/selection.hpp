@@ -157,7 +157,7 @@ std::pair<typename T::value_type, typename T::value_type> getMinMaxOpt(const T& 
     std::integral auto sz = container.size();
     if (!sz) throw std::invalid_argument("Container is empty");
     typename T::value_type minv, maxv;
-    auto it = container.begin();
+    auto it = container.cbegin();
     if (sz & 1) maxv = minv = *it++;
     else { 
         std::tie(minv, maxv) = std::minmax(*it, *(std::next(it))); 

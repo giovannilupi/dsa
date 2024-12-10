@@ -4,9 +4,13 @@
 #include <string>
 #include "power.hpp"
 
+using ::testing::TestWithParam;
+
+namespace {
+
 using PowFunc = std::function<int64_t(int, uint8_t)>;
 
-static std::map<std::string, PowFunc> powerFunctions = {
+const std::map<std::string, PowFunc> powerFunctions = {
     {"PowerRecursive", alg::powRec<int>},
     {"PowerTailRecursive", alg::powTailRec<int>},
     {"PowerIterative", alg::powIter<int>},
@@ -15,12 +19,14 @@ static std::map<std::string, PowFunc> powerFunctions = {
     {"PowerSquaringTailRec", alg::powSquaringTailRec<int>},
 };
 
-class PowerTest : 
-    public ::testing::TestWithParam<std::pair<const std::string, PowFunc>> 
-{};
+} // namespace
+
+using PowerTestParamT = decltype(powerFunctions)::value_type;
+
+class PowerTest : public TestWithParam<PowerTestParamT> {};
 
 TEST_P(PowerTest, WorksWithZeroBase) {
-    auto powerFunction = GetParam().second;
+    const auto& powerFunction = GetParam().second;
 
     EXPECT_EQ(powerFunction(0, 0), 1);
     EXPECT_EQ(powerFunction(0, 1), 0);
@@ -29,7 +35,7 @@ TEST_P(PowerTest, WorksWithZeroBase) {
 }
 
 TEST_P(PowerTest, WorksWithOneBase) {
-    auto powerFunction = GetParam().second;
+    const auto& powerFunction = GetParam().second;
 
     EXPECT_EQ(powerFunction(1, 0), 1);
     EXPECT_EQ(powerFunction(1, 1), 1);
@@ -38,7 +44,7 @@ TEST_P(PowerTest, WorksWithOneBase) {
 }
 
 TEST_P(PowerTest, WorksWithNegativeBase) {
-    auto powerFunction = GetParam().second;
+    const auto& powerFunction = GetParam().second;
 
     EXPECT_EQ(powerFunction(-1, 100), 1);
     EXPECT_EQ(powerFunction(-2, 0), 1);
@@ -50,7 +56,7 @@ TEST_P(PowerTest, WorksWithNegativeBase) {
 }
 
 TEST_P(PowerTest, WorksWithRandomInputs) {
-    auto powerFunction = GetParam().second;
+    const auto& powerFunction = GetParam().second;
 
     EXPECT_EQ(powerFunction(333, 2), 110889);
     EXPECT_EQ(powerFunction(2, 10), 1024);
@@ -66,6 +72,4 @@ TEST_P(PowerTest, WorksWithRandomInputs) {
 
 INSTANTIATE_TEST_SUITE_P(PowerTestsGenerator, PowerTest,
     ::testing::ValuesIn(powerFunctions),
-    [](const testing::TestParamInfo<PowerTest::ParamType>& info) {
-        return info.param.first;
-    });
+    [](const auto& info) { return info.param.first; });

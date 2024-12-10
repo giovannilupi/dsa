@@ -1,19 +1,29 @@
-#include <functional>
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
+#include <format>
+#include <functional>
 #include "power_set.hpp"
 
-using PowerSetFunc = std::function<std::vector<std::vector<int>>(std::vector<int>)>;
+using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-static std::map<std::string, PowerSetFunc> powerSetFunctions = {
+namespace {
+
+using PowerSetFunc = std::function<std::vector<std::vector<int>>(std::vector<int>)>;
+
+const std::map<std::string, PowerSetFunc> powerSetFunctions = {
     {"PowerSetIter", alg::powerSetIter<std::vector<int>>},
     {"PowerSetRec", alg::powerSetDFS<std::vector<int>>},
     {"PowerSetLib", alg::powerSetBacktrack<std::vector<int>>}
 };
 
-static std::map<std::string, std::pair<std::vector<int>, std::vector<std::vector<int>>>> testCases = {
+struct TestPowerSetInput {
+    const std::vector<int> input;
+    const std::vector<std::vector<int>> expected;
+};
+
+const std::map<std::string, TestPowerSetInput> testCases = {
     {"EmptySet", 
         {{}, {{}}
     }},
@@ -43,18 +53,18 @@ static std::map<std::string, std::pair<std::vector<int>, std::vector<std::vector
     }
 };
 
-class PowerSetTest :
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, PowerSetFunc>,
-    std::pair<const std::string, std::pair<std::vector<int>, std::vector<std::vector<int>>>>>>
-{};
+} // namespace
+
+using PowerSetParamT = std::tuple<decltype(powerSetFunctions)::value_type, decltype(testCases)::value_type>;
+
+class PowerSetTest : public TestWithParam<PowerSetParamT> {};
 
 TEST_P(PowerSetTest, TestPowerSet) {
-    auto param = GetParam();
-    auto powerSetFunc = std::get<0>(param).second;
-    auto testCase = std::get<1>(param).second.first;
-    auto expected = std::get<1>(param).second.second;
-    auto res = powerSetFunc(testCase);
+    const auto& param = GetParam();
+    const auto& powerSetFunc = std::get<0>(param).second;
+    const auto& input = std::get<1>(param).second.input;
+    auto expected = std::get<1>(param).second.expected;
+    auto res = powerSetFunc(input);
 
     // Ignore the order of the elements in the comparison
     for (auto& subset : expected)
@@ -66,6 +76,6 @@ TEST_P(PowerSetTest, TestPowerSet) {
 
 INSTANTIATE_TEST_SUITE_P(PowerSetTestsGenerator, PowerSetTest,
     Combine(ValuesIn(powerSetFunctions), ValuesIn(testCases)),
-    [](const testing::TestParamInfo<PowerSetTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
+    [](const auto& info) { 
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });

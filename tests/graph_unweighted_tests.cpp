@@ -5,8 +5,13 @@
 #include "graph_unweighted.hpp"
 
 using namespace alg;
+using ::testing::TestWithParam;
 
-static const std::map<std::string, std::vector<std::vector<int>>> directedGraphs = {
+namespace {
+
+using Graph = std::vector<std::vector<int>>;
+
+const std::map<std::string, Graph> directedGraphs = {
 {
         "DirectedSimpleGraph", 
         {
@@ -92,7 +97,7 @@ static const std::map<std::string, std::vector<std::vector<int>>> directedGraphs
     }
 };
 
-static const std::map<std::string, std::vector<std::vector<int>>> undirectedGraphs = {
+const std::map<std::string, Graph> undirectedGraphs = {
 {
         "UndirectedSimpleGraph",
         {
@@ -157,31 +162,32 @@ static const std::map<std::string, std::vector<std::vector<int>>> undirectedGrap
     }
 };
 
-static const std::map<std::string, std::vector<std::vector<int>>> unweightedGraphs = [] {
-    std::map<std::string, std::vector<std::vector<int>>> combined = undirectedGraphs;
+const std::map<std::string, Graph> unweightedGraphs = [] {
+    auto combined = undirectedGraphs;
     // Insert directed graphs
-    combined.insert(directedGraphs.begin(), directedGraphs.end());
+    combined.insert(directedGraphs.cbegin(), directedGraphs.cend());
     return combined;
 }();
 
-class GraphTest : public ::testing::TestWithParam<
-    std::pair<const std::string, 
-    std::vector<std::vector<int>>>> 
-{};
+} // namespace
 
-void testGraphTraversal(const std::vector<std::vector<int>>& adjList, const std::string& graphName, auto& func) {
+using GraphTestParamT = decltype(unweightedGraphs)::value_type;
+
+class GraphTest : public TestWithParam<GraphTestParamT> {};
+
+void testGraphTraversal(const Graph& adjList, const std::string& graphName, const auto& func) {
     // Increase by one each node on which the function is applied
     std::vector<int> result(adjList.size(), 0);
     static auto callback = [&result](int& val) { ++result[val]; };
     func(adjList, 0, callback);
-    // Check nodes increment
+    // Check nodes incrementm
     if (graphName.find("Disconnected") != std::string::npos) {
         // Node 2 and 3 are not reachable from source 0
         EXPECT_EQ(result, std::vector<int>({1, 1, 0, 0}));
     }
     // Connected graphs
     else {
-        for (auto &num : result) EXPECT_EQ(num, 1);
+        for (const auto &num : result) EXPECT_EQ(num, 1);
     }
 }
 
@@ -197,14 +203,11 @@ TEST_P(GraphTest, ApplyWorks) {
 
 INSTANTIATE_TEST_SUITE_P(GraphTestsGenerator, GraphTest,
     ::testing::ValuesIn(unweightedGraphs),
-    [](const testing::TestParamInfo<GraphTest::ParamType>& info) {
-        return info.param.first;
-    });
+    [](const auto& info) { return info.param.first; });
 
-class UndirectedGraphTest : public ::testing::TestWithParam<
-    std::pair<const std::string, 
-    std::vector<std::vector<int>>>> 
-{};
+using UndirGraphTestParamT = decltype(undirectedGraphs)::value_type;
+
+class UndirectedGraphTest : public TestWithParam<UndirGraphTestParamT> {};
 
 TEST_P(UndirectedGraphTest, IsCyclicWorks) {
     const auto& [graphName, adjList] = GetParam();
@@ -217,14 +220,11 @@ TEST_P(UndirectedGraphTest, IsCyclicWorks) {
 
 INSTANTIATE_TEST_SUITE_P(UndirectedGraphTestsGenerator, UndirectedGraphTest,
     ::testing::ValuesIn(undirectedGraphs),
-    [](const testing::TestParamInfo<UndirectedGraphTest::ParamType>& info) {
-        return info.param.first;
-    });
+    [](const auto& info) { return info.param.first; });
 
-class DirectedGraphTest : public ::testing::TestWithParam<
-    std::pair<const std::string, 
-    std::vector<std::vector<int>>>> 
-{};
+using DirGraphTestParamT = decltype(directedGraphs)::value_type;
+
+class DirectedGraphTest : public TestWithParam<DirGraphTestParamT> {};
 
 TEST_P(DirectedGraphTest, IsCyclicWorks) {
     const auto& [graphName, adjList] = GetParam();
@@ -236,12 +236,12 @@ TEST_P(DirectedGraphTest, IsCyclicWorks) {
     else EXPECT_FALSE(isCyclicDirected(adjList));
 }
 
-bool isValidTopologicalOrder(const std::vector<int>& order, const std::vector<std::vector<int>>& adjList) {
+bool isValidTopologicalOrder(const std::vector<int>& order, const Graph& adjList) {
     // Map to store the index of each node in the order
     std::unordered_map<int, int> indexMap;
     for (int i = 0; i < order.size(); ++i) indexMap[order[i]] = i;
     for (int node = 0; node < adjList.size(); ++node) {
-        for (int neighbor : adjList[node]) {
+        for (const auto& neighbor : adjList[node]) {
             // Check if the current node appears before its neighbor in the order
             if (indexMap[node] > indexMap[neighbor]) {
                 // Not a valid topological order
@@ -258,27 +258,25 @@ TEST_P(DirectedGraphTest, TopSort) {
     if (graphName.find("Cycle") == std::string::npos &&  
         graphName.find("Complete") == std::string::npos &&
         graphName.find("Random") == std::string::npos) {
-        auto result = topologicalSort(adjList);
+        const auto result = topologicalSort(adjList);
         EXPECT_TRUE(isValidTopologicalOrder(result, adjList));
     }
 }
 
 INSTANTIATE_TEST_SUITE_P(DirectedGraphTestTestsGenerator, DirectedGraphTest,
     ::testing::ValuesIn(directedGraphs),
-    [](const testing::TestParamInfo<DirectedGraphTest::ParamType>& info) {
-        return info.param.first;
-    });
+    [](const auto& info) { return info.param.first; });
 
 TEST(GraphTest, TreeToGraphWorks) {
     // Test trees
-    std::map<std::string, TreeNode<int>*> testTrees = {
+    const std::map<std::string, TreeNode<int>*> testTrees = {
         {"EmptyTree", nullptr},
         {"OneElementTree", toBinaryTree({12})},
         {"TwoElementsTree", toBinaryTree({10, 20})},
         {"SimpleTree", toBinaryTree({4, 2, 6, 1, 3, 5, 7})},
     };
     // Expected adjacency lists for each tree
-    std::map<std::string, std::unordered_map<int, std::vector<int>>> expectedAdjLists = {
+    const std::map<std::string, std::unordered_map<int, std::vector<int>>> expectedAdjLists = {
         {"EmptyTree", {}},
         {"OneElementTree", {{12, {}}}},
         {"TwoElementsTree", {{10, {20}}, {20, {10}}}},
@@ -286,27 +284,27 @@ TEST(GraphTest, TreeToGraphWorks) {
     };
     // Loop through each tree and check the conversion
     for (const auto& [treeName, treeRoot] : testTrees) {
-        auto adjList = binTreeToGraph(treeRoot);
+        const auto adjList = binTreeToGraph(treeRoot);
         // Check that the adjacency list contains the same keys
-        EXPECT_EQ(adjList.size(), expectedAdjLists[treeName].size()) << "Failed for tree: " << treeName;
+        EXPECT_EQ(adjList.size(), expectedAdjLists.at(treeName).size()) << "Failed for tree: " << treeName;
         // Loop through each expected adjacency list entry and verify unordered equality
-        for (const auto& [key, expectedNeighbors] : expectedAdjLists[treeName]) {
+        for (const auto& [key, expectedNeighbors] : expectedAdjLists.at(treeName)) {
             // Check if the key exists in the actual adjacency list
             EXPECT_TRUE(adjList.count(key) > 0) << "Key " << key << " not found in adjList for tree: " << treeName;
             // Check for unordered equality of neighbors
-            EXPECT_THAT(adjList[key], ::testing::UnorderedElementsAreArray(expectedNeighbors)) 
+            EXPECT_THAT(adjList.at(key), ::testing::UnorderedElementsAreArray(expectedNeighbors)) 
                 << "Failed for tree: " << treeName << ", key: " << key;
         }
     }
     // Clean up the allocated memory
-    for (auto& [_, treeRoot] : testTrees) {
+    for (const auto& [_, treeRoot] : testTrees) {
         deleteTree(treeRoot);
     }
 }
 
 TEST(GraphTest, GetTreeCenterWorks) {
     // Test trees as adjacency lists
-    std::map<std::string, std::pair<std::vector<std::vector<int>>, std::vector<int>>> testTrees = {
+    const std::map<std::string, std::pair<Graph, std::vector<int>>> testTrees = {
         {"SingleNode", { {{}}, {0} } },
         {"StraightLine", { {{1}, {0, 2}, {1}, {0}}, {1} } },
         {"StarShape", { {{1, 2, 3}, {0}, {0}, {0}}, {0} } },
@@ -317,13 +315,13 @@ TEST(GraphTest, GetTreeCenterWorks) {
     // Loop through each tree and check the center calculation
     for (const auto& [treeName, treeData] : testTrees) {
         const auto& [adjList, expectedCenter] = treeData;
-        auto center = getTreeCenter(adjList);
+        const auto center = getTreeCenter(adjList);
         EXPECT_EQ(center, expectedCenter) << "Failed for tree: " << treeName;
     }
 }
 
 TEST(GraphTest, ShortestPathLength) {
-    std::vector<std::vector<int>> undirectedGraph = {
+    const Graph undirectedGraph = {
         {1, 2},         // 0 -> 1, 2
         {0, 3, 4},  // 1 -> 0, 3, 4
         {0},                // 2 -> 0
@@ -331,7 +329,7 @@ TEST(GraphTest, ShortestPathLength) {
         {1},                // 4 -> 1
     };
     
-    std::vector<std::vector<int>> directedGraph = {
+    const Graph directedGraph = {
         {1},                // 0 -> 1
         {0, 2, 3},  // 1 -> 0, 2, 3
         {3},                // 2 -> 1
@@ -356,7 +354,7 @@ TEST(GraphTest, ShortestPathLength) {
 }
 
 TEST(GraphTest, BfsTreeAndMinPath) {
-    std::vector<std::vector<int>> connectedGraph = {
+    const Graph connectedGraph = {
         {1, 2},         // 0 -> 1, 2
         {0, 3},         // 1 -> 0, 3
         {0, 3},         // 2 -> 0, 3
@@ -364,7 +362,7 @@ TEST(GraphTest, BfsTreeAndMinPath) {
         {3}                 // 4 -> 3
     };
 
-    std::vector<std::vector<int>> disconnectedGraph = {
+    const Graph disconnectedGraph = {
         {1},    // 0 -> 1
         {0},    // 1 -> 0
         {},         // 2 is isolated
