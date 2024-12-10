@@ -1,9 +1,14 @@
 #include <gtest/gtest.h>
 #include "sudoku.hpp"
 
+using ::testing::TestWithParam;
+using ::testing::ValuesIn;
+
+namespace {
+
 using SudokuBoard = std::vector<std::vector<char>>;
 
-static std::map<std::string, std::pair<SudokuBoard, bool>> testBoards = {
+const std::map<std::string, std::pair<SudokuBoard, bool>> testBoards = {
     {"Valid9x9", {{
         {'5', '3', '.', '.', '7', '.', '.', '.', '.'},
         {'6', '.', '.', '1', '9', '5', '.', '.', '.'},
@@ -82,21 +87,19 @@ static std::map<std::string, std::pair<SudokuBoard, bool>> testBoards = {
     }}
 };
 
-class SudokuTest : 
-    public ::testing::TestWithParam<std::pair<const std::string, std::pair<SudokuBoard, bool>>>
-{};
+} // namespace
+
+using SudokuTestParamT = decltype(testBoards)::value_type;
+
+class SudokuTest : public TestWithParam<SudokuTestParamT> {};
 
 TEST_P(SudokuTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto board = std::get<1>(param).first;
-    auto expected = std::get<1>(param).second;
+    const auto& [board, expected] = GetParam().second;
     // Check if the board is valid
     EXPECT_EQ(alg::isValidSudoku(board, '.'), expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(SudokuTestsGenerator, SudokuTest,
-    ::testing::ValuesIn(testBoards),
-    [](const testing::TestParamInfo<SudokuTest::ParamType>& info) {
-        return std::get<0>(info.param); // Return the description as the test name
-    });
+    ValuesIn(testBoards),
+    [](const auto& info) { return info.param.first; });

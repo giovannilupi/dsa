@@ -17,10 +17,10 @@ namespace alg {
  */
 template <Matrix T>
     requires std::equality_comparable<typename T::value_type::value_type>
-bool isValidSudoku(T &board, typename T::value_type::value_type filler) {
+bool isValidSudoku(const T &board, const typename T::value_type::value_type& filler) {
     // Check if the board is a square
-    auto sz = board.size();
-    decltype(sz) box_sz = static_cast<decltype(sz)>(sqrt(sz));
+    const auto sz = board.size();
+    const auto box_sz = static_cast<decltype(sz)>(sqrt(sz));
     if (box_sz * box_sz != sz) throw std::invalid_argument("Board is not a square");
     // Define groups of rows, columns and boxes
     using VType = typename T::value_type::value_type;
@@ -32,8 +32,8 @@ bool isValidSudoku(T &board, typename T::value_type::value_type filler) {
     for (index row = 0; row != sz; ++row) {
         for (index col = 0; col != sz; ++col) {
             if (board[row][col] == filler) continue;
-            index box = box_sz * (row / box_sz) + col / box_sz;
-            VType curr = board[row][col];
+            const index box = box_sz * (row / box_sz) + col / box_sz;
+            const VType& curr = board[row][col];
             if (!rows[row].insert(curr).second || 
                 !cols[col].insert(curr).second ||
                 !boxes[box].insert(curr).second) return false;
