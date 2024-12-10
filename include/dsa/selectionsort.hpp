@@ -10,7 +10,7 @@ namespace alg {
  */ 
 template <SortableContainer T>
 void selectionSort(T& container) {
-    index sz = container.size();
+    const index sz = container.size();
     for (index i = 0; i < sz; ++i) {
         index minidx = i;
         for (index j = i+1; j < sz; ++j) {

@@ -11,7 +11,7 @@ namespace alg {
  */
 template <SortableContainer T>
 void insertionSort(T& container) {
-    index sz = container.size();
+    const index sz = container.size();
     for (index i = 1; i < sz; ++i) {
         // We go backwards looking for the insert position
         for (index j = i; j && container[j-1] > container[j]; --j) {

@@ -15,7 +15,7 @@ namespace detail {
 template <SortableContainer T>
 index partition(T& container, index low, index high) {
     index j = low;
-    typename T::value_type& pivot = container[high];
+    auto& pivot = container[high];
     while (low < high) {
         if (container[low] <= pivot) 
             std::swap(container[low], container[j++]);
@@ -72,7 +72,7 @@ void quickSortRandomHelper(T& container, index low, index high) {
  */
 template <SortableContainer T>
 void quickSortCoarseHelper(T& container, index low, index high) {
-    static const int k = 10;
+    constexpr int k = 10;
     if (low < high) {
         if (high - low < k) insertionSortIdx(container, low, high);
         else {

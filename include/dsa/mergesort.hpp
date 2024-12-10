@@ -49,7 +49,7 @@ void mergeSortHelper(T& container, index low, index high) {
  */
 template <SortableContainer T>
 void mergeSortCoarseHelper(T& container, index low, index high) {
-    static const index k = 10;
+    constexpr index k = 10;
     // The problem is simple enough to solve directly
     if ((high - low) < k) insertionSortIdx(container, low, high);
     // Otherwise, divide and conquer

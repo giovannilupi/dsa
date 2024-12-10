@@ -30,7 +30,7 @@ public:
      * Finds the root of the set containing x (representative of the set).
      * This implementation uses path compression to optimize subsequent operations.
      */
-    int find(const int x) {
+    int find(int x) {
         if (x < 0 || x >= parent.size()) throw std::out_of_range(std::format("Node {} is out of range", x));
         if (parent[x] != x) parent[x] = find(parent[x]);
         return parent[x];
@@ -40,11 +40,11 @@ public:
      * Unites the sets containing x and y.
      * This implementation uses union by rank to minimize the height of the tree.
      */
-    void unite(const int x, const int y) {
+    void unite(int x, int y) {
         if (x < 0 || x >= parent.size()) throw std::out_of_range(std::format("Node {} is out of range", x));
         if (y < 0 || y >= parent.size()) throw std::out_of_range(std::format("Node {} is out of range", y));
-        const int xRoot = find(x);
-        const int yRoot = find(y);
+        int xRoot = find(x);
+        int yRoot = find(y);
         // Already in the same set
         if (xRoot == yRoot) return;
         // Attach the smaller tree to the larger tree

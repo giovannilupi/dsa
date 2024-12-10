@@ -7,7 +7,6 @@
 #include <vector>
 #include "union_find.hpp"
 
-
 namespace alg {
 
 /**
@@ -20,7 +19,7 @@ inline int mstKruskal(const std::vector<std::vector<std::pair<int, int>>>& adjLi
     // Collect edges
     std::vector<std::tuple<int, int, int>> edges;
     for (int u = 0; u != n; ++u) {
-        for (auto &[v, weight] : adjList[u]) {
+        for (const auto &[v, weight] : adjList[u]) {
             // Avoid duplicate edges, given the graph is undirected
             if (u < v) edges.emplace_back(weight, u, v);
         }
@@ -32,7 +31,7 @@ inline int mstKruskal(const std::vector<std::vector<std::pair<int, int>>>& adjLi
     int mstWeight = 0;
     int mstEdges = 0;
     // Process edges in order
-    for (auto &[weight, u, v] : edges) {
+    for (const auto &[weight, u, v] : edges) {
         if (uf.find(u) != uf.find(v)) {
             uf.unite(u, v);
             mstWeight += weight;
@@ -60,14 +59,14 @@ inline int mstPrim(const std::vector<std::vector<std::pair<int, int>>>& adjList)
     dist[0] = 0;
     int mstWeight = 0;
     while (!pq.empty()) {
-        auto [w, u] = pq.top();
+        const auto [w, u] = pq.top();
         pq.pop();
         // Outdated edge
         if (visited[u]) continue;
         visited[u] = true;
         mstWeight += w;
         // Add each outgoing edge to the priority queue
-        for (auto &[v, weight] : adjList[u]) {
+        for (const auto &[v, weight] : adjList[u]) {
             // Do not add outdated edges 
             if (!visited[v] && dist[v] > weight) {
                 dist[v] = weight;
@@ -93,10 +92,10 @@ inline std::vector<int> djikstra(const std::vector<std::vector<std::pair<int, in
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;
     pq.emplace(0, source);
     while (!pq.empty()) {
-        auto [d, u] = pq.top();
+        const auto [d, u] = pq.top();
         pq.pop();
         if (d > dist[u]) continue;
-        for (auto &[v, weight] : adjList[u]) {
+        for (const auto &[v, weight] : adjList[u]) {
             // Relax edge (u, v)
             if (d + weight < dist[v]) {
                 dist[v] = d + weight;
@@ -105,6 +104,6 @@ inline std::vector<int> djikstra(const std::vector<std::vector<std::pair<int, in
         }
     }
     return dist;    
-} 
+}
 
 } // namespace alg

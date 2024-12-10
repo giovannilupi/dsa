@@ -25,7 +25,7 @@ class Trie {
      * It marks the end of word flag to false for the word to be removed.
      * Then, it recursively removes unused nodes, if any.
      */
-    bool removeHelper(TrieNode* node, const std::string& word, const int depth) {
+    bool removeHelper(TrieNode* node, const std::string& word, int depth) {
         // Reached end of word
         if (depth == word.size()) {
             // Word not found, nothing to delete

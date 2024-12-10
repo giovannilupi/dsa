@@ -10,7 +10,7 @@ namespace alg {
  */
 template <SortableContainer T>
 void bubbleSort(T& container) {
-    index sz = container.size();
+    const index sz = container.size();
     // Loop at most n-1 times
     for (index i = sz-1; i; --i) {
         bool swapped = false;
