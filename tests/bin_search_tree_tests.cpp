@@ -1,130 +1,153 @@
-#include <algorithm>
-#include <climits>
-#include <functional>
 #include <gtest/gtest.h>
+#include <format>
+#include <algorithm>
+#include <limits>
+#include <functional>
+#include <memory>
 #include "bin_search_tree.hpp"
 #include "binary_tree.hpp"
 
-using namespace alg;
+using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
+
+namespace { 
+
+using alg::TreeNode;
 using InsertFunc = std::function<TreeNode<int>*(TreeNode<int>*, int)>;
 using FindFunc = std::function<const TreeNode<int>*(const TreeNode<int>*, int)>;
 using RemoveFunc = std::function<TreeNode<int>*(TreeNode<int>*, int)>;
 
-static std::map<std::string, TreeNode<int>*> testTrees = {
+/*
+ * This test has multiple fixtures that share the same input containing dynamically allocated memory.
+ * Using a per-test-suite teardown to cleanup the memory is not possible.
+ * This is because that memory is used by multiple test suites.
+ * There is no built-in way to guarantee the cleanup after execution of all test suites.
+ * One way to enforce it is to wrap the trees into shared_ptrs to automate deletion.
+ * An alternative would be to create and delete the input map in each fixure.
+ */
+struct TestBSTInput {
+    TestBSTInput(TreeNode<int>* root) : 
+        root(std::shared_ptr<TreeNode<int>>(root,
+            [](TreeNode<int>* root) { deleteTree(root); })) {}
+    
+    TreeNode<int>* tree() const { return root.get(); }
+
+private:
+    const std::shared_ptr<TreeNode<int>> root;
+};
+
+const std::map<std::string, TestBSTInput> testTrees = {
     {"EmptyBST", nullptr},
-    {"OneElementBST", toBinaryTree({12})},
-    {"TwoElementsBST", toBinaryTree({20, 10})},
-    {"SimpleBST", toBinaryTree({4, 2, 6, 1, 3, 5, 7})},
-    {"LargeBST", toBinaryTree({16, 8, 24, 4, 12, 20, 28, 2, 6, 10, 14, 18, 22, 26, 30})},
+    {"OneElementBST", alg::toBinaryTree({12})},
+    {"TwoElementsBST", alg::toBinaryTree({20, 10})},
+    {"SimpleBST", alg::toBinaryTree({4, 2, 6, 1, 3, 5, 7})},
+    {"LargeBST", alg::toBinaryTree({16, 8, 24, 4, 12, 20, 28, 2, 6, 10, 14, 18, 22, 26, 30})},
 };
 
-static std::map<std::string, InsertFunc> insertFunctions = {
-    {"InsertBSTRecursive", insertBSTRec<int>},
-    {"InsertBSTIterative", insertBSTIter<int>},
+const std::map<std::string, InsertFunc> insertFunctions = {
+    {"InsertBSTRecursive", alg::insertBSTRec<int>},
+    {"InsertBSTIterative", alg::insertBSTIter<int>},
 };
 
-static std::map<std::string, FindFunc> findFunctions = {
-    {"FindBSTRecursive", findBSTRec<int>},
-    {"FindBSTIterative", findBSTIter<int>},
+const std::map<std::string, FindFunc> findFunctions = {
+    {"FindBSTRecursive", alg::findBSTRec<int>},
+    {"FindBSTIterative", alg::findBSTIter<int>},
 };
 
-static std::map<std::string, RemoveFunc> removeFunctions = {
-    {"RemoveBSTRecursive", removeBSTRec<int>},
-    {"RemoveBSTIterative", removeBSTIter<int>},
+const std::map<std::string, RemoveFunc> removeFunctions = {
+    {"RemoveBSTRecursive", alg::removeBSTRec<int>},
+    {"RemoveBSTIterative", alg::removeBSTIter<int>},
 };
 
-class BSTInsertTest : 
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, InsertFunc>,
-    std::pair<const std::string, TreeNode<int>*>>>
-{};
+} // namespace
+
+using BSTInsertTestParamT = std::tuple<decltype(insertFunctions)::value_type, decltype(testTrees)::value_type>;
+
+class BSTInsertTest : public TestWithParam<BSTInsertTestParamT> {};
 
 TEST_P(BSTInsertTest, InsertWorks) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto insertFunc = std::get<0>(param).second;
-    TreeNode<int>* tree = copyTree(std::get<1>(param).second);
-    if (!tree) {
-        tree = insertFunc(tree, 10);
-        tree = insertFunc(tree, 20);
-        tree = insertFunc(tree, 0);
-        EXPECT_TRUE(checkBST(tree));
+    const auto& param = GetParam();
+    const auto& insertFunc = std::get<0>(param).second;
+    const auto& inputTree = std::get<1>(param).second.tree();
+
+    TreeNode<int>* copiedTree = copyTree(inputTree);
+    if (!inputTree) {
+        copiedTree = insertFunc(copiedTree, 10);
+        copiedTree = insertFunc(copiedTree, 20);
+        copiedTree = insertFunc(copiedTree, 0);
+        EXPECT_TRUE(checkBST(copiedTree));
     }
     else {
-        auto vec = toVector(tree);
+        const auto vec = toVector(inputTree);
         // Handle duplicate values
-        TreeNode<int>* res = copyTree(tree);
-        for (const auto& val : vec) res = insertFunc(res, val);
-        EXPECT_TRUE(checkEqualTrees(tree, res));
-        deleteTree(res);
+        for (const auto& val : vec) copiedTree = insertFunc(copiedTree, val);
+        EXPECT_TRUE(checkEqualTrees(inputTree, copiedTree));
         // Handle non-duplicate values
-        int max = *std::max_element(vec.begin(), vec.end());
-        int min = *std::min_element(vec.begin(), vec.end());
-        insertFunc(tree, max + 1);
-        insertFunc(tree, min - 1);
-        EXPECT_TRUE(checkBST(tree));
+        int max = *std::max_element(vec.cbegin(), vec.cend());
+        int min = *std::min_element(vec.cbegin(), vec.cend());
+        insertFunc(copiedTree, max + 1);
+        insertFunc(copiedTree, min - 1);
+        EXPECT_TRUE(checkBST(copiedTree));
     }
-    deleteTree(tree);
+    deleteTree(copiedTree);
 }
 
 INSTANTIATE_TEST_SUITE_P(BSTInsertTestsGenerator, BSTInsertTest,
     Combine(ValuesIn(insertFunctions), ValuesIn(testTrees)),
-    [](const testing::TestParamInfo<BSTInsertTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
+    [](const auto& info) { 
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });
 
-class BSTFindTest : 
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, FindFunc>,
-    std::pair<const std::string, TreeNode<int>*>>>
-{};
+using BSTFindTestParamT = std::tuple<decltype(findFunctions)::value_type, decltype(testTrees)::value_type>;
+
+class BSTFindTest : public TestWithParam<BSTFindTestParamT> {};
 
 TEST_P(BSTFindTest, FindWorks) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto insertFunc = std::get<0>(param).second;
-    TreeNode<int>* tree = std::get<1>(param).second;
+    const auto& param = GetParam();
+    const auto& insertFunc = std::get<0>(param).second;
+    TreeNode<int>* tree = std::get<1>(param).second.tree();
+
     auto vec = toVector(tree);
     for (const auto& val : vec) {
-        auto node = findBSTIter(tree, val);
+        const auto node = findBSTIter(tree, val);
         EXPECT_TRUE(node);
         EXPECT_EQ(node->val, val);
     }
-    auto maxv = vec.empty() ? 0 : *std::max_element(vec.begin(), vec.end());
+    auto maxv = vec.empty() ? 0 : *std::max_element(vec.cbegin(), vec.cend());
     EXPECT_FALSE(findBSTIter(tree, maxv + 1));
 }
 
 INSTANTIATE_TEST_SUITE_P(BSTFindTestsGenerator, BSTFindTest,
     Combine(ValuesIn(findFunctions), ValuesIn(testTrees)),
-    [](const testing::TestParamInfo<BSTFindTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
+    [](const auto& info) { 
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });
 
-class BSTRemoveTest : 
-    public ::testing::TestWithParam<std::tuple<
-    std::pair<const std::string, RemoveFunc>,
-    std::pair<const std::string, TreeNode<int>*>>>
-{};
+using BSTRemoveTestParamT = std::tuple<decltype(removeFunctions)::value_type, decltype(testTrees)::value_type>;
+
+class BSTRemoveTest : public TestWithParam<BSTRemoveTestParamT> {};
 
 TEST_P(BSTRemoveTest, RemoveWorks) {
     // Get the parameters for the current test case
-    auto param = GetParam();
-    auto removeFunc = std::get<0>(param).second;
-    TreeNode<int>* tree = copyTree(std::get<1>(param).second);
+    const auto& param = GetParam();
+    const auto& removeFunc = std::get<0>(param).second;
+    
+    TreeNode<int>* tree = copyTree(std::get<1>(param).second.tree());
     if (!tree) {
         tree = removeFunc(tree, 0);
         EXPECT_EQ(tree, nullptr);
         EXPECT_TRUE(checkBST(tree));
     }
     else {
-        auto vec = toVector(tree);
+        const auto vec = toVector(tree);
         auto sz = vec.size();
         for (const auto& val : vec) {
             tree = removeFunc(tree, val);
-            auto currvec = toVector(tree);
-            EXPECT_EQ(std::find(currvec.begin(), currvec.end(), val), currvec.end());
+            const auto currvec = toVector(tree);
+            EXPECT_EQ(std::find(currvec.cbegin(), currvec.cend(), val), currvec.cend());
             EXPECT_EQ(currvec.size(), --sz);
             EXPECT_TRUE(checkBST(tree));
         }
@@ -134,16 +157,16 @@ TEST_P(BSTRemoveTest, RemoveWorks) {
 
 INSTANTIATE_TEST_SUITE_P(BSTRemoveTestsGenerator, BSTRemoveTest,
     Combine(ValuesIn(removeFunctions), ValuesIn(testTrees)),
-    [](const testing::TestParamInfo<BSTRemoveTest::ParamType>& info) {
-        return std::get<0>(info.param).first + "_" + std::get<1>(info.param).first;
+    [](const auto& info) { 
+        return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });
 
-class BSTTest : 
-    public ::testing::TestWithParam<std::pair<const std::string, TreeNode<int>*>>
-{};
+using BSTTestParamT = decltype(testTrees)::value_type;
+
+class BSTTest : public TestWithParam<BSTTestParamT> {};
 
 TEST_P(BSTTest, GetMinMaxWorks) {
-    TreeNode<int>* tree = GetParam().second;
+    TreeNode<int>* tree = GetParam().second.tree();
     auto min = getBSTMin(tree);
     auto max = getBSTMax(tree);
     if (!tree) {
@@ -151,14 +174,16 @@ TEST_P(BSTTest, GetMinMaxWorks) {
         EXPECT_FALSE(max);
     }
     else {
-        auto vec = toVector(tree);
-        EXPECT_EQ(min->val, *std::min_element(vec.begin(), vec.end()));
-        EXPECT_EQ(max->val, *std::max_element(vec.begin(), vec.end()));
+        EXPECT_TRUE(min);
+        EXPECT_TRUE(max);
+        const auto vec = toVector(tree);
+        EXPECT_EQ(min->val, *std::min_element(vec.cbegin(), vec.cend()));
+        EXPECT_EQ(max->val, *std::max_element(vec.cbegin(), vec.cend()));
     }
 }
 
 TEST_P(BSTTest, GetKthMinWorks) {
-    TreeNode<int>* tree = GetParam().second;
+    TreeNode<int>* tree = GetParam().second.tree();
     if (!tree) {
         EXPECT_FALSE(getBSTKthMin(tree, 0));
     }
@@ -172,10 +197,10 @@ TEST_P(BSTTest, GetKthMinWorks) {
 }
 
 TEST_P(BSTTest, CheckBSTWorks) {
-    TreeNode<int>* tree = copyTree(GetParam().second);
+    const TreeNode<int>* tree = copyTree(GetParam().second.tree());
     EXPECT_TRUE(checkBST(tree));
     if (tree && tree->left) {
-        tree->left->val = INT_MAX;
+        tree->left->val = std::numeric_limits<int>::max();
         EXPECT_FALSE(checkBST(tree));
     }
     deleteTree(tree);
@@ -183,13 +208,11 @@ TEST_P(BSTTest, CheckBSTWorks) {
 
 INSTANTIATE_TEST_SUITE_P(BSTTestsGenerator, BSTTest,
     ::testing::ValuesIn(testTrees),
-    [](const testing::TestParamInfo<BSTTest::ParamType>& info) {
-        return info.param.first;
-    });
+    [](const auto& info) { return info.param.first; });
 
 TEST(BSTTest, ToBSTWorks) {
-    auto tree = toBinaryTree({4, 6, 2, 7, 3, 5, 1});
-    auto expected = toBinaryTree({4, 2, 6, 1, 3, 5, 7});
+    auto tree = alg::toBinaryTree({4, 6, 2, 7, 3, 5, 1});
+    auto expected = alg::toBinaryTree({4, 2, 6, 1, 3, 5, 7});
     toBST(tree);
     EXPECT_TRUE(checkEqualTrees(tree, expected));
     EXPECT_TRUE(checkBST(tree));
@@ -219,7 +242,7 @@ TEST(LCATest, LowestCommonAncestorWorks) {
     TreeNode<int>* nineNode = eightNode->right = new TreeNode<int>(9);
 
     // LCA of 4 and 8 is 6
-    auto lca = lcaBST(root, fourNode, eightNode); 
+    auto* lca = lcaBST(root, fourNode, eightNode); 
     EXPECT_EQ(lca->val, 6);
     // LCA of 3 and 5 is 4
     lca = lcaBST(root, root->left->left, root->left->right); 

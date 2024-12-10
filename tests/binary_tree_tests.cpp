@@ -4,25 +4,43 @@
 #include <numeric>
 #include "binary_tree.hpp"
 
-using namespace alg;
+using ::testing::TestWithParam;
+using ::testing::ValuesIn;
 
-static std::map<std::string, TreeNode<int>*> testTrees = {
+namespace {
+
+using alg::TreeNode;
+
+const std::map<std::string, TreeNode<int>*> testTrees = {
     {"EmptyTree", nullptr},
-    {"OneElementTree", toBinaryTree({12})},
-    {"TwoElementsTree", toBinaryTree({10, 20})},
-    {"RepeatedElementsTree", toBinaryTree({7, 7, 7, 7, 7})},
-    {"SimpleTree", toBinaryTree({4, 2, 6, 1, 3, 5, 7})},
+    {"OneElementTree", alg::toBinaryTree({12})},
+    {"TwoElementsTree", alg::toBinaryTree({10, 20})},
+    {"RepeatedElementsTree", alg::toBinaryTree({7, 7, 7, 7, 7})},
+    {"SimpleTree", alg::toBinaryTree({4, 2, 6, 1, 3, 5, 7})},
 };
 
-class BinTreeTest : 
-    public ::testing::TestWithParam<std::pair<const std::string, TreeNode<int>*>>
-{};
+} // namespace
+
+using BinTreeTestParamT = decltype(testTrees)::value_type;
+
+class BinTreeTest : public TestWithParam<BinTreeTestParamT> {
+protected:
+    /* Per-test-suite teardown. 
+     * Called after once after the last test in this test suite. 
+     * This is used to cleanup the dynamically allocated trees shared by the parameterized tests.
+     */
+    static void TearDownTestSuite() {
+        for (const auto& [_, tree] : testTrees) {
+            deleteTree(tree);
+        }
+    }
+};
 
 TEST_P(BinTreeTest, ApplyWorks) {
     TreeNode<int>* tree = copyTree(GetParam().second);
     auto vec = toVector(tree);
-    //Increment all the elements of the tree by 1
-    auto func = [](int& val) { val += 1; };
+    // Increment all the elements of the tree by 1
+    static auto func = [](int& val) { val += 1; };
     // BFS
     bfsTreeApply<int>(tree, func);
     std::transform(vec.begin(), vec.end(), vec.begin(), [](int val) { return val + 1; });
@@ -44,8 +62,8 @@ TEST_P(BinTreeTest, ApplyWorks) {
 }
 
 TEST_P(BinTreeTest, CopyWorks) {
-    TreeNode<int>* tree = GetParam().second;
-    TreeNode<int>* copy = copyTree(GetParam().second);
+    const TreeNode<int>* tree = GetParam().second;
+    const TreeNode<int>* copy = copyTree(GetParam().second);
     EXPECT_TRUE(checkEqualTrees(tree, copy));
     deleteTree(copy);
 }
@@ -53,8 +71,9 @@ TEST_P(BinTreeTest, CopyWorks) {
 TEST_P(BinTreeTest, EqualWorks) {
     TreeNode<int>* tree = GetParam().second;
     auto vec = toVector(tree);
+    EXPECT_TRUE(checkEqualTrees(tree, alg::toBinaryTree(vec)));
     vec.push_back(1);
-    EXPECT_FALSE(checkEqualTrees(tree, toBinaryTree(vec)));
+    EXPECT_FALSE(checkEqualTrees(tree, alg::toBinaryTree(vec)));
     EXPECT_TRUE(checkEqualTrees(tree, tree));
 }
 
@@ -62,54 +81,56 @@ TEST_P(BinTreeTest, FindWorks) {
     TreeNode<int>* tree = GetParam().second;
     auto vec = toVector(tree);
     for (const auto& val : vec) {
-        auto node = findTreeNode(tree, val);
+        const auto* node = findTreeNode(tree, val);
         EXPECT_TRUE(node);
         EXPECT_EQ(node->val, val);
     }
-    auto maxv = vec.empty() ? 0 : *std::max_element(vec.begin(), vec.end());
+    auto maxv = vec.empty() ? 0 : *std::max_element(vec.cbegin(), vec.cend());
     EXPECT_FALSE(findTreeNode(tree, maxv + 1));
 }
 
 TEST_P(BinTreeTest, GetMinMaxWorks) {
     TreeNode<int>* tree = GetParam().second;
-    auto min = findMinTreeNode(tree);
-    auto max = findMaxTreeNode(tree);
+    const auto* min = findMinTreeNode(tree);
+    const auto* max = findMaxTreeNode(tree);
     if (!tree) {
         EXPECT_FALSE(min);
         EXPECT_FALSE(max);
     }
     else {
-        auto vec = toVector(tree);
-        EXPECT_EQ(min->val, *std::min_element(vec.begin(), vec.end()));
-        EXPECT_EQ(max->val, *std::max_element(vec.begin(), vec.end()));
+        EXPECT_TRUE(min);
+        EXPECT_TRUE(max);
+        const auto vec = toVector(tree);
+        EXPECT_EQ(min->val, *std::min_element(vec.cbegin(), vec.cend()));
+        EXPECT_EQ(max->val, *std::max_element(vec.cbegin(), vec.cend()));
     }
 }
 
 TEST_P(BinTreeTest, AccumulateWorks) {
     TreeNode<int>* tree = GetParam().second;
-    auto sum = accumulateTree(tree);
+    const auto sum = accumulateTree(tree);
     if (!tree) {
         EXPECT_EQ(sum, 0);
     }
     else {
-        auto vec = toVector(tree);
-        EXPECT_EQ(sum, std::accumulate(vec.begin(), vec.end(), 0));
+        const auto vec = toVector(tree);
+        EXPECT_EQ(sum, std::accumulate(vec.cbegin(), vec.cend(), 0));
     }
 }
 
 TEST_P(BinTreeTest, SizeWorks) {
     TreeNode<int>* tree = GetParam().second;
-    auto vec = toVector(tree);
+    const auto vec = toVector(tree);
     EXPECT_EQ(vec.size(), getTreeSize(tree));
 }
 
 INSTANTIATE_TEST_SUITE_P(BinTreeTestsGenerator, BinTreeTest,
-    ::testing::ValuesIn(testTrees),
-    [](const testing::TestParamInfo<BinTreeTest::ParamType>& info) {
-        return info.param.first;
-    });
+    ValuesIn(testTrees),
+    [](const auto& info) { return info.param.first; });
 
-static TreeNode<int>* createSimpleTree() {
+namespace {
+
+TreeNode<int>* createSimpleTree() {
     // Construct the following tree:
     //        4
     //       / \
@@ -121,7 +142,7 @@ static TreeNode<int>* createSimpleTree() {
             new TreeNode<int>(6, new TreeNode<int>(5), new TreeNode<int>(7)));
 }
 
-static TreeNode<int>* createDegenerateTree() {
+TreeNode<int>* createDegenerateTree() {
     // Construct the following tree:
     //        4
     //       /
@@ -131,13 +152,15 @@ static TreeNode<int>* createDegenerateTree() {
     return new TreeNode<int>(4, new TreeNode<int>(2, new TreeNode<int>(1), nullptr), nullptr);
 }
 
+} // namespace
+
 TEST(BinTreeTest, ToBinaryTreeWorks) {
-    auto expected = createSimpleTree();
-    auto root = toBinaryTree({4, 2, 6, 1, 3, 5, 7});
+    auto* expected = createSimpleTree();
+    auto* root = alg::toBinaryTree({4, 2, 6, 1, 3, 5, 7});
     EXPECT_TRUE(checkEqualTrees(root, expected));
     deleteTree(root);
     deleteTree(expected);
-    root = toBinaryTree<int>({});
+    root = alg::toBinaryTree<int>({});
     expected = nullptr;
     EXPECT_TRUE(checkEqualTrees(root, expected));
 }
@@ -173,8 +196,8 @@ TEST(BinTreeTest, HeightWorks) {
 }
 
 TEST(BinTreeTest, MirrorWorks) {
-    TreeNode<int>* original = toBinaryTree({1, 2, 3, 4, 5, 6, 7});
-    TreeNode<int>* expected = toBinaryTree({1, 3, 2, 7, 6, 5, 4});
+    TreeNode<int>* original = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    TreeNode<int>* expected = alg::toBinaryTree({1, 3, 2, 7, 6, 5, 4});
     mirrorTree(original);
     EXPECT_TRUE(checkEqualTrees(original, expected));
     deleteTree(original);
@@ -187,8 +210,8 @@ TEST(BinTreeTest, MirrorWorks) {
 }
 
 TEST(BinTreeTest, MirrorCheckWorks) {
-    TreeNode<int>* original = toBinaryTree({1, 2, 3, 4, 5, 6, 7});
-    TreeNode<int>* expected = toBinaryTree({1, 3, 2, 7, 6, 5, 4});
+    TreeNode<int>* original = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    TreeNode<int>* expected = alg::toBinaryTree({1, 3, 2, 7, 6, 5, 4});
     EXPECT_TRUE(checkMirrorTree(original, expected));
     deleteTree(original);
     deleteTree(expected);
@@ -196,6 +219,12 @@ TEST(BinTreeTest, MirrorCheckWorks) {
     original = nullptr;
     expected = nullptr;
     EXPECT_TRUE(checkMirrorTree(original, expected));
+    // Work with trees that are not mirrors
+    original = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    expected = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    EXPECT_FALSE(checkMirrorTree(original, expected));
+    deleteTree(original);
+    deleteTree(expected);
 }
 
 TEST(BinTreeTest, NodeLevelWorks) {
@@ -259,17 +288,16 @@ TEST(BinTreeTest, DiameterWorks) {
 }
 
 TEST(BinTreeTest, isHeightBalancedWorks) {
-    auto completeTree = createSimpleTree();
+    auto* completeTree = createSimpleTree();
     EXPECT_TRUE(isHeightBalanced(completeTree));
     // Make the tree not balanced
-    auto newRoot = new TreeNode<int>(0, completeTree, nullptr);
+    const auto* newRoot = new TreeNode<int>(0, completeTree, nullptr);
     EXPECT_FALSE(isHeightBalanced(newRoot));
     deleteTree(newRoot);
-    auto notCompleteTree = createDegenerateTree();
+    auto* notCompleteTree = createDegenerateTree();
     EXPECT_FALSE(isHeightBalanced(notCompleteTree));
     // Diff 1 between subtrees
-    auto node1 = new TreeNode<int>(1);
-    notCompleteTree->right = node1;
+    notCompleteTree->right = new TreeNode<int>(1);
     EXPECT_TRUE(isHeightBalanced(notCompleteTree));
     deleteTree(notCompleteTree);
 }
