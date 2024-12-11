@@ -5,9 +5,13 @@
 #include <vector>
 #include "heap.hpp"
 
-using namespace alg;
+using alg::MaxHeap;
+using alg::MinHeap;
+using ::testing::Types;
 
-static std::vector<std::vector<int>> testVectors = {
+namespace {
+
+const std::vector<std::vector<int>> testVectors = {
     {},
     {1},
     {7, 7, 7, 7, 7},
@@ -16,6 +20,8 @@ static std::vector<std::vector<int>> testVectors = {
     {1, 2, 3, 4, 5},
     {10, -20, 30, -40, 50},
 };
+
+} // namespace
 
 template <typename HeapT>
 struct HeapComparator;
@@ -32,11 +38,11 @@ struct HeapComparator<MinHeap<int>> {
 
 /**
  * This is a complex test suite.
- * To test two objects with the same interface and requirments, we can use Type-Parameterized Tests.
+ * To test two objects with the same interface and requirments, we can use Typed Tests.
  * We'd like to test each object against multiple inputs, so it would be nice to use a Value-Parameterized Test.
  * However, gtest does not support a way to combine them.
  * https://stackoverflow.com/questions/8507385/google-test-is-there-a-way-to-combine-a-test-which-is-both-type-parameterized-a
- * The compromise is to set up a Type-Parameterized test suite and use a loop in each test case to test all inputs.
+ * The compromise is to set up a Typed test suite and use a loop in each test case to test all inputs.
  * Compared to a Value-Parameterized Test, the gtest output becomes less granular.
  */
 template <typename HeapT>
@@ -44,14 +50,14 @@ class HeapTest : public testing::Test {
 protected:
     // Verifies that the given heap respects the heap property
     bool isHeap(const HeapT& heap) {
-        auto vec = heap.toVector();
-        return std::is_heap(vec.begin(), vec.end(), cmp);
+        const auto& vec = heap.toVector();
+        return std::is_heap(vec.cbegin(), vec.cend(), cmp);
     }
     typename HeapComparator<HeapT>::Comparator cmp;
 };
 
-using MyTypes = ::testing::Types<MaxHeap<int>, MinHeap<int>>;
-TYPED_TEST_SUITE(HeapTest, MyTypes);
+using HeapTypes = Types<MaxHeap<int>, MinHeap<int>>;
+TYPED_TEST_SUITE(HeapTest, HeapTypes);
 
 TYPED_TEST(HeapTest, ContainerConstructor) {
     for (const auto& testVector : testVectors) {
@@ -68,7 +74,7 @@ TYPED_TEST(HeapTest, IteratorConstructor) {
 }
 
 TYPED_TEST(HeapTest, InitializerConstructor) {
-    // Initializer list
+    // Initializer lists
     std::initializer_list<int> emptyList = {};
     std::initializer_list<int> singleList = {1};
     std::initializer_list<int> simpleList = {3, 5, 1, 10, 2, 7};
@@ -83,7 +89,7 @@ TYPED_TEST(HeapTest, InitializerConstructor) {
 
 TYPED_TEST(HeapTest, InsertElements) {
     for (const auto& testVector : testVectors) {
-        static const std::vector <int> inserts = {3, 5, 1, 10, 2, 7};
+        static const std::vector<int> inserts = {3, 5, 1, 10, 2, 7};
         TypeParam heap(testVector);
         for (const auto& insert : inserts) {
             heap.insert(insert);
