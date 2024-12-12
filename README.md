@@ -12,7 +12,7 @@ Data Structures and Algorithms in C++20
 
 ## Features
 
-The implementations hereby provided are primarily intended for educational purposes, although some can offer practical usage. For example, the binary search implementation provided here is more convenient than the one in the [Standard Template Library (STL)](https://en.cppreference.com/w/cpp/standard_library). Other implementations, such as those of data structures already present in the STL, are only meant to showcase their internal workings. Additionally, some algorithms are implemented in multiple styles (e.g. iterative vs recursive) to explore different problem-solving strategies.
+The implementations hereby provided are primarily intended for educational purposes, although some can offer practical usage. For example, the binary search implementation provided here is more convenient than the one in the [Standard Library (SL)](https://en.cppreference.com/w/cpp/standard_library). Other implementations, such as those of data structures already present in the SL, are only meant to showcase their internal workings. Additionally, some algorithms are implemented in multiple styles (e.g. iterative vs recursive) to explore different problem-solving strategies.
 
 A notable feature of this library is its use of C++20 concepts. While the standard has recently started promoting the use of concepts for all template arguments, practical examples are still scarce. This work features several usage examples of standard library concepts, along with new ones defined in the [alg_concepts](./include/dsa/alg_concepts.hpp) header. These custom concepts are primarily implemented by combining existing concepts from the C++ standard library using logical conditions. However, defining new concepts is far from trivial, so it is advisable to review them thoroughly before using them in serious applications.
 
@@ -36,7 +36,7 @@ Complete beginners in theoretical comptuter science and programming might benefi
 All functions in the library have been unit tested using the [Google Test](https://github.com/google/googletest) framework. These test suites ensure that the library functions as intended and demonstrate advanced testing features such as:
 - Fixtures
 - Parameterized Tests
-- Type-Parameterized Tests
+- Typed Tests
 
 The tests are designed to be comprehensive and to enhance the readability of the output. For instance, value-parameterized tests can handle multiple inputs and provide more granular results compared to traditional loops.
 
