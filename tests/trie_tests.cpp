@@ -6,7 +6,7 @@ using alg::Trie;
 
 namespace {
 
-const std::vector<std::string> words = {"apple", "app", "banana", "bat"};
+constexpr std::array words = {"apple", "app", "banana", "bat"};
 
 } // namespace
 

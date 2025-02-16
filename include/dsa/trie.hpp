@@ -1,7 +1,8 @@
 #pragma once
 
+#include <string_view>
 #include <unordered_map>
-#include <string>
+#include "common.hpp"
 
 namespace alg {
 
@@ -25,7 +26,7 @@ class Trie {
      * It marks the end of word flag to false for the word to be removed.
      * Then, it recursively removes unused nodes, if any.
      */
-    bool removeHelper(TrieNode* node, const std::string& word, int depth) {
+    bool removeHelper(TrieNode* node, std::string_view word, index depth) {
         // Reached end of word
         if (depth == word.size()) {
             // Word not found, nothing to delete
@@ -35,7 +36,7 @@ class Trie {
             return node->children.empty();
         }
         char c = word[depth];
-        if (!node->children.count(c)) return false;
+        if (!node->children.contains(c)) return false;
         bool shouldDeleteChild = removeHelper(node->children[c], word, depth + 1);
         if (shouldDeleteChild) {
             delete node->children[c];
@@ -50,8 +51,8 @@ class Trie {
      * Deletes the Trie recursively.
      */
     void deleteTrie(const TrieNode* node) {
-        for (const auto& child : node->children) {
-            deleteTrie(child.second);
+        for (const auto& [_, child] : node->children) {
+            deleteTrie(child);
         }
         delete node;
     }
@@ -68,10 +69,10 @@ public:
      * Inserts a word into the Trie.
      * If the word already exists, no change is made.
      */
-    void insert(const std::string& word) {
+    void insert(std::string_view word) {
         TrieNode* node = root;
-        for (const char c : word) {
-            if (!node->children.count(c)) {
+        for (char c : word) {
+            if (!node->children.contains(c)) {
                 node->children[c] = new TrieNode();
             }
             node = node->children[c];
@@ -83,10 +84,10 @@ public:
      * Searches for a word in the Trie.
      * Returns true if the word exists, false otherwise.
      */
-    bool search(const std::string& word) {
+    bool search(std::string_view word) {
         TrieNode* node = root;
-        for (const char c : word) {
-            if (!node->children.count(c)) return false;
+        for (char c : word) {
+            if (!node->children.contains(c)) return false;
             node = node->children[c];
         }
         return node->isEndOfWord;
@@ -96,10 +97,10 @@ public:
      * Checks if the Trie contains a word that starts with the given prefix.
      * Returns true if the prefix exists, false otherwise.
      */
-    bool startsWith(const std::string& prefix) {
+    bool startsWith(std::string_view prefix) {
         TrieNode* node = root;
-        for (const char c : prefix) {
-            if (!node->children.count(c)) return false;
+        for (char c : prefix) {
+            if (!node->children.contains(c)) return false;
             node = node->children[c];
         }
         return true;
@@ -109,7 +110,7 @@ public:
      * Removes a word from the Trie.
      * If the word does not exist, no change is made.
      */
-    void remove(const std::string& word) {
+    void remove(std::string_view word) {
         removeHelper(root, word, 0);
     }
 };
