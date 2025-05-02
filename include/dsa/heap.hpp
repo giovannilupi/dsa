@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include "alg_concepts.hpp"
+#include "common.hpp"
 
 namespace alg {
 
@@ -24,28 +25,11 @@ public:
     Heap() = default;
 
     /**
-     * Constructs a heap from a container.
+     * Constructs a heap from a list of elements.
      * Complexity: O(n)
      */
-    template <std::ranges::random_access_range Container>
-    Heap(const Container& container) : vec(container.begin(), container.end()) {
-        buildHeap();
-    }
-
-    /**
-     * Constructs a heap from an iterator range.
-     * Complexity: O(n)
-     */
-    template <std::random_access_iterator Iter>
-    Heap(Iter first, Iter last) : vec(first, last) {
-        buildHeap();
-    }
-
-    /**
-     * Constructs a heap from an initializer list.
-     * Complexity: O(n)
-     */
-    Heap(std::initializer_list<T> list) : vec(list) {
+    template <typename... Args>
+    Heap(Args&&... args) : vec(std::forward<Args>(args)...) {
         buildHeap();
     }
 
@@ -53,8 +37,10 @@ public:
      * Inserts an element into the heap.
      * Complexity: O(log n)
      */
-    void insert(const T& value) { 
-        vec.push_back(value);
+    template <typename U>
+        requires std::convertible_to<U, T>
+    void insert(U&& value) { 
+        vec.push_back(std::forward<U>(value));
         heapifyUpIter(vec.size() - 1);
     }
 
@@ -64,7 +50,7 @@ public:
      * Complexity: O(log n)
      */
     T extract() {
-        T result = peek();
+        T result = std::move(vec.front());
         remove();
         return result;
     }
@@ -75,7 +61,7 @@ public:
      * Complexity: O(log n)
      */
     void remove() { 
-        vec.front() = vec.back();
+        vec.front() = std::move(vec.back());
         vec.pop_back();
         heapifyDownIter(0);
      }
@@ -112,22 +98,22 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Heap& heap) {
         if (heap.vec.empty()) return os;
 
-        int height = std::log2(heap.vec.size()) + 1;
-        int index = 0;
+        index height = std::log2(heap.vec.size()) + 1;
+        index idx = 0;
 
         for (int i = 0; i < height; ++i) {
             int levelSize = std::pow(2, i);
             int spacing = std::pow(2, height - i) - 1;
 
             // Print nodes at the current level
-            for (int j = 0; j < levelSize && index < heap.vec.size(); ++j) {
+            for (int j = 0; j < levelSize && idx < heap.vec.size(); ++j) {
                 // Print leading spaces
                 for (int k = 0; k < spacing; ++k) {
                     os << " ";
                 }
                 // Print the node value
-                os << heap.vec[index];
-                ++index;
+                os << heap.vec[idx];
+                ++idx;
 
                 // Print trailing spaces
                 for (int k = 0; k < spacing; ++k) {
@@ -150,7 +136,7 @@ private:
      * Complexity: O(n)
      */
     void buildHeap() {
-        for (int i = (vec.size() / 2) - 1; i >= 0; --i) heapifyDownIter(i);
+        for (index i = (vec.size() / 2) - 1; i >= 0; --i) heapifyDownIter(i);
     }
 
     /**
@@ -159,10 +145,10 @@ private:
      * Complexity: O(log n)
      */
     void heapifyDownRec(int idx) {
-        int lt = left(idx);
-        int rt = right(idx);
-        int sz = size();
-        int largest = idx;
+        index lt = left(idx);
+        index rt = right(idx);
+        index sz = size();
+        index largest = idx;
         // Find the largest element between current node and its children
         if (lt < sz && cmp(vec[lt], vec[largest])) largest = lt;
         if (rt < sz && cmp(vec[rt], vec[largest])) largest = rt;
@@ -178,11 +164,11 @@ private:
      * This floats elements down the heap to maintain the heap property.
      */
     void heapifyDownIter(int idx) {
-        int sz = vec.size();
+        index sz = vec.size();
         while (true) {
-            int largest = idx;
-            int lt = left(largest);
-            int rt = right(largest);
+            index largest = idx;
+            index lt = left(largest);
+            index rt = right(largest);
             // Find the largest element between current node and its children
             if (lt < sz && cmp(vec[lt], vec[largest])) largest = lt;
             if (rt < sz && cmp(vec[rt], vec[largest])) largest = rt;
@@ -198,9 +184,9 @@ private:
      * Iterative implementation of the heapify up procedure.
      * This floats elements up the heap to maintain the heap property.
      */
-    void heapifyUpIter(int idx) {
+    void heapifyUpIter(index idx) {
         while (idx > 0) {
-            int p = parent(idx);
+            index p = parent(idx);
             if (cmp(vec[idx], vec[p])) { 
                 std::swap(vec[idx], vec[p]); 
                 idx = p; 
@@ -213,9 +199,9 @@ private:
      * Recursive implementation of the heapify up procedure.
      * This floats elements up the heap to maintain the heap property.
      */
-    void heapifyUpRec(int idx) {
+    void heapifyUpRec(index idx) {
         if (idx > 0) {
-            int p = parent(idx);
+            index p = parent(idx);
             if (cmp(vec[idx], vec[p])) {
                 std::swap(vec[idx], vec[p]);
                 heapifyUpRec(p);
@@ -226,15 +212,15 @@ private:
     /**
      * Returns the index of the parent node of the node at the given index.
      */
-    inline int parent(int idx) const { return (idx - 1) >> 1; }
+    inline index parent(index idx) const { return (idx - 1) >> 1; }
     /**
      * Returns the index of the left child of the node at the given index.
      */
-    inline int left(int idx) const { return (idx << 1) + 1; }
+    inline index left(index idx) const { return (idx << 1) + 1; }
     /**
      * Returns the index of the right child of the node at the given index.
      */
-    inline int right(int idx) const { return (idx << 1) + 2; }
+    inline index right(index idx) const { return (idx << 1) + 2; }
 };
 
 } // namespace detail

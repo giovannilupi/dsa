@@ -46,7 +46,7 @@ template <typename HeapT>
 class HeapTest : public testing::Test {
 protected:
     // Verifies that the given heap respects the heap property
-    bool isHeap(const HeapT& heap) {
+    bool isHeap(const HeapT& heap) const {
         const auto& vec = heap.toVector();
         return std::ranges::is_heap(vec, cmp);
     }
@@ -65,28 +65,25 @@ TYPED_TEST(HeapTest, ContainerConstructor) {
 
 TYPED_TEST(HeapTest, IteratorConstructor) {
     for (const auto& testVector : testVectors) {
-        TypeParam heap(testVector.begin(), testVector.end());
+        TypeParam heap(testVector);
         EXPECT_TRUE(this->isHeap(heap));
     }
 }
 
 TYPED_TEST(HeapTest, InitializerConstructor) {
-    // Initializer lists
-    std::initializer_list<int> emptyList = {};
-    std::initializer_list<int> singleList = {1};
-    std::initializer_list<int> simpleList = {3, 5, 1, 10, 2, 7};
-    // Heap
-    TypeParam heap(emptyList);
-    EXPECT_TRUE(this->isHeap(heap));
-    heap = singleList;
-    EXPECT_TRUE(this->isHeap(heap));
-    heap = simpleList;
-    EXPECT_TRUE(this->isHeap(heap));
+    const TypeParam emptyHeap(std::initializer_list<int>{});
+    EXPECT_TRUE(this->isHeap(emptyHeap));
+
+    const TypeParam singleHeap(std::initializer_list<int>{1});
+    EXPECT_TRUE(this->isHeap(singleHeap));
+
+    const TypeParam simpleHeap(std::initializer_list<int>{3, 5, 1, 10, 2, 7});
+    EXPECT_TRUE(this->isHeap(simpleHeap));
 }
 
 TYPED_TEST(HeapTest, InsertElements) {
+    static constexpr std::array inserts = {3, 5, 1, 10, 2, 7};
     for (const auto& testVector : testVectors) {
-        static const std::vector<int> inserts = {3, 5, 1, 10, 2, 7};
         TypeParam heap(testVector);
         for (const auto& insert : inserts) {
             heap.insert(insert);
