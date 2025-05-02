@@ -6,26 +6,24 @@
 #include <vector>
 #include "list.hpp"
 
-using alg::SListNode;
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::ElementsAre;
 using ::testing::ValuesIn;
 
-namespace {
-
 const std::map<std::string, SListNode<int>*> testParams = {
     {"EmptyList", nullptr},
-    {"SimpleList", alg::toList({1, 2, 3, 4, 5})},
-    {"SingleElementList", alg::toList({42})},
-    {"TwoElementsList", alg::toList({10, 20})},
-    {"RepeatedElementsList", alg::toList({7, 7, 7, 7, 7})},
-    {"NegativeAndPositiveList", alg::toList({-5, -1, 0, 1, 5})},
-    {"DescendingList", alg::toList({9, 7, 5, 3, 1})},
-    {"AscendingList", alg::toList({1, 2, 3, 4, 5})},
-    {"AlternateSignList", alg::toList({10, -20, 30, -40, 50})},
+    {"SimpleList", toList({1, 2, 3, 4, 5})},
+    {"SingleElementList", toList({42})},
+    {"TwoElementsList", toList({10, 20})},
+    {"RepeatedElementsList", toList({7, 7, 7, 7, 7})},
+    {"NegativeAndPositiveList", toList({-5, -1, 0, 1, 5})},
+    {"DescendingList", toList({9, 7, 5, 3, 1})},
+    {"AscendingList", toList({1, 2, 3, 4, 5})},
+    {"AlternateSignList", toList({10, -20, 30, -40, 50})},
 };
-
-} // namespace
 
 using ListTestParamT = decltype(testParams)::value_type;
 
@@ -53,7 +51,7 @@ TEST_P(ListTestValParam, ReverseList) {
     const auto& param = GetParam().second;
     auto list = copyList(param);
     auto vec = listToVector(list);
-    std::reverse(vec.begin(), vec.end());
+    std::ranges::reverse(vec);
     list = reverseList(list);
     EXPECT_EQ(listToVector(list), vec);
     deleteList(list);
@@ -157,8 +155,8 @@ protected:
 
     std::unordered_map<std::string, SListNode<int>*> testLists = {
         {"EmptyList", nullptr},
-        {"SingleElementList", alg::toList({1})},
-        {"SimpleList", alg::toList({1, 2, 3, 4, 5})},
+        {"SingleElementList", toList({1})},
+        {"SimpleList", toList({1, 2, 3, 4, 5})},
         {"ListWithLoop", createCyclicList()}
     };
 
@@ -201,15 +199,18 @@ TEST_F(ListTestFixture, ToVector) {
 }
 
 TEST_F(ListTestFixture, ToList) {
-    auto* list = alg::toList<int>({});
+    auto* list = toList<int>({});
     EXPECT_THAT(listToVector(list), ElementsAre());
     deleteList(list);
 
-    list = alg::toList({1});
+    list = toList({1});
     EXPECT_THAT(listToVector(list), ElementsAre(1));
     deleteList(list);
 
-    list = alg::toList({1, 2, 3, 4, 5});
+    list = toList({1, 2, 3, 4, 5});
     EXPECT_THAT(listToVector(list), ElementsAre(1, 2, 3, 4, 5));
     deleteList(list);
 }
+
+}  // namespace
+}  // namespace alg

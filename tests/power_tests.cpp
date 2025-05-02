@@ -4,22 +4,21 @@
 #include <string>
 #include "power.hpp"
 
-using ::testing::TestWithParam;
-
+namespace alg {
 namespace {
+
+using ::testing::TestWithParam;
 
 using PowFunc = std::function<int64_t(int, uint8_t)>;
 
 const std::map<std::string, PowFunc> powerFunctions = {
-    {"PowerRecursive", alg::powRec<int>},
-    {"PowerTailRecursive", alg::powTailRec<int>},
-    {"PowerIterative", alg::powIter<int>},
-    {"PowerSquaring", alg::powSquaring<int>},
-    {"PowerSquaringRecursive", alg::powSquaringRec<int>},
-    {"PowerSquaringTailRec", alg::powSquaringTailRec<int>},
+    {"PowerRecursive", powRec<int>},
+    {"PowerTailRecursive", powTailRec<int>},
+    {"PowerIterative", powIter<int>},
+    {"PowerSquaring", powSquaring<int>},
+    {"PowerSquaringRecursive", powSquaringRec<int>},
+    {"PowerSquaringTailRec", powSquaringTailRec<int>},
 };
-
-} // namespace
 
 using PowerTestParamT = decltype(powerFunctions)::value_type;
 
@@ -73,3 +72,6 @@ TEST_P(PowerTest, WorksWithRandomInputs) {
 INSTANTIATE_TEST_SUITE_P(PowerTestsGenerator, PowerTest,
     ::testing::ValuesIn(powerFunctions),
     [](const auto& info) { return info.param.first; });
+
+}  // namespace
+}  // namespace alg

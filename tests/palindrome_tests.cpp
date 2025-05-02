@@ -3,36 +3,58 @@
 #include <format>
 #include "palindrome.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-namespace {
-
 using PalindromFunc = std::function<bool(const std::vector<int>&)>;
 
 const std::map<std::string, PalindromFunc> palindromeFunctions = {
-    {"IsPalindromeRecursive", alg::isPalindromeRec<std::vector<int>>},
-    {"IsPalindromeIterative", alg::isPalindromeIter<std::vector<int>>}
+    {"IsPalindromeRecursive", isPalindromeRec<std::vector<int>>},
+    {"IsPalindromeIterative", isPalindromeIter<std::vector<int>>}
 };
 
 struct TestPalindromeInput {
-    const std::vector<int> input;
-    const bool expected;
+    std::vector<int> input;
+    bool expected;
 };
 
 const std::map<std::string, TestPalindromeInput> testVectors = {
-    {"Empty", { {}, true} },
-    {"OneElement", { {1}, true} },
-    {"TwoElementsSame", { {1, 1}, true} },
-    {"TwoElementsDifferent", { {1, 2}, false} },
-    {"OddPalindrome", { {1, 2, 1}, true} },
-    {"EvenPalindrome", { {1, 2, 2, 1}, true} },
-    {"OddNonPalindrome", { {1, 2, 3}, false} },
-    {"EvenNonPalindrome", { {1, 2, 3, 4}, false} },
-    {"AllSame", { {1, 1, 1, 1, 1}, true} },
-    {"AllDifferent", { {1, 2, 3, 4, 5}, false} },
-    {"LargePalindrome", { {
+    {"Empty", { 
+        .input = {}, 
+        .expected = true} },
+    {"OneElement", { 
+        .input = {1}, 
+        .expected = true} },
+    {"TwoElementsSame", { 
+        .input = {1, 1}, 
+        .expected = true} },
+    {"TwoElementsDifferent", { 
+        .input = {1, 2}, 
+        .expected = false} },
+    {"OddPalindrome", { 
+        .input = {1, 2, 1}, 
+        .expected = true} },
+    {"EvenPalindrome", { 
+        .input = {1, 2, 2, 1}, 
+        .expected = true} },
+    {"OddNonPalindrome", { 
+        .input = {1, 2, 3},
+        .expected = false} },
+    {"EvenNonPalindrome", {
+        .input = {1, 2, 3, 4}, 
+        .expected = false} },
+    {"AllSame", {
+        .input = {1, 1, 1, 1, 1}, 
+        .expected = true} },
+    {"AllDifferent", {
+        .input = {1, 2, 3, 4, 5}, 
+        .expected = false} },
+    {"LargePalindrome", { 
+        .input = {
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
         11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
         21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
@@ -52,10 +74,9 @@ const std::map<std::string, TestPalindromeInput> testVectors = {
         40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 
         30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 
         20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 
-        10, 9, 8, 7, 6, 5, 4, 3, 2, 1 }, true} }
+        10, 9, 8, 7, 6, 5, 4, 3, 2, 1 }, 
+        .expected = true} }
 };
-
-} // namespace
 
 using PalindromeTestParamT = std::tuple<decltype(palindromeFunctions)::value_type, decltype(testVectors)::value_type>;
 
@@ -75,3 +96,6 @@ INSTANTIATE_TEST_SUITE_P(PalindromeTestsGenerator, PalindromeTest,
     [](const auto& info) { 
         return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });
+
+}  // namespace
+}  // namespace alg

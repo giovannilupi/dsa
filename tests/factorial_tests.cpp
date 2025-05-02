@@ -4,20 +4,19 @@
 #include <functional> 
 #include "factorial.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::ValuesIn;
-
-namespace {
 
 using FactFunc = std::function<uint64_t(uint64_t)>;
 
 const std::map<std::string, FactFunc> factorialFunctions = {
-    {"FactorialRecursive", alg::factRec},
-    {"FactorialTailRecursive", alg::factTailRec},
-    {"FactorialIterative", alg::factIter},
+    {"FactorialRecursive", factRec},
+    {"FactorialTailRecursive", factTailRec},
+    {"FactorialIterative", factIter},
 };
-
-} // namespace
 
 using FactTestParamT = decltype(factorialFunctions)::value_type;
 
@@ -44,3 +43,6 @@ TEST_P(FactorialTest, WorksWithAllInputs) {
 INSTANTIATE_TEST_SUITE_P(FactorialTestsGenerator, FactorialTest, 
     ValuesIn(factorialFunctions),
     [](const auto& info) { return info.param.first; }); 
+
+}  // namespace
+}  // namespace alg

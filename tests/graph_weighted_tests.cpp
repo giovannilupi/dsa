@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include "graph_weighted.hpp"
 
+namespace alg {
+namespace {
+
 using WeightedGraph = std::vector<std::vector<std::pair<int, int>>>;
 
 TEST(GraphTest, MSTWork) {
@@ -55,3 +58,6 @@ TEST(GraphTest, DjikstraWorks) {
     expected = {0, 3, 1, 4};
     ASSERT_EQ(alg::djikstra(graph, 0), expected);
 }
+
+}  // namespace
+}  // namespace alg

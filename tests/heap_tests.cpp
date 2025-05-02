@@ -5,11 +5,10 @@
 #include <vector>
 #include "heap.hpp"
 
-using alg::MaxHeap;
-using alg::MinHeap;
-using ::testing::Types;
-
+namespace alg {
 namespace {
+
+using ::testing::Types;
 
 const std::vector<std::vector<int>> testVectors = {
     {},
@@ -20,8 +19,6 @@ const std::vector<std::vector<int>> testVectors = {
     {1, 2, 3, 4, 5},
     {10, -20, 30, -40, 50},
 };
-
-} // namespace
 
 template <typename HeapT>
 struct HeapComparator;
@@ -51,7 +48,7 @@ protected:
     // Verifies that the given heap respects the heap property
     bool isHeap(const HeapT& heap) {
         const auto& vec = heap.toVector();
-        return std::is_heap(vec.cbegin(), vec.cend(), cmp);
+        return std::ranges::is_heap(vec, cmp);
     }
     typename HeapComparator<HeapT>::Comparator cmp;
 };
@@ -109,3 +106,6 @@ TYPED_TEST(HeapTest, ExtractElements) {
         }
     }
 }
+
+}  // namespace
+}  // namespace alg

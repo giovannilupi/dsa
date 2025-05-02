@@ -4,10 +4,10 @@
 #include <unordered_set>
 #include "graph_unweighted.hpp"
 
-using namespace alg;
-using ::testing::TestWithParam;
-
+namespace alg {
 namespace {
+
+using ::testing::TestWithParam;
 
 using Graph = std::vector<std::vector<int>>;
 
@@ -168,8 +168,6 @@ const std::map<std::string, Graph> unweightedGraphs = [] {
     combined.insert(directedGraphs.cbegin(), directedGraphs.cend());
     return combined;
 }();
-
-} // namespace
 
 using GraphTestParamT = decltype(unweightedGraphs)::value_type;
 
@@ -402,3 +400,6 @@ TEST(GraphTest, BfsTreeAndMinPath) {
     EXPECT_TRUE(pathRec.empty());
     EXPECT_TRUE(pathIter.empty());
 }
+
+}  // namespace
+}  // namespace alg

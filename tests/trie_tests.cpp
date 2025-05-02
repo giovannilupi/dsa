@@ -2,13 +2,10 @@
 #include <vector>
 #include "trie.hpp"
 
-using alg::Trie;
-
+namespace alg {
 namespace {
 
 constexpr std::array words = {"apple", "app", "banana", "bat"};
-
-} // namespace
 
 class TrieTest : public ::testing::Test {
 protected:
@@ -61,3 +58,6 @@ TEST_F(TrieTest, RemoveWorks) {
     EXPECT_FALSE(trie.search("abc"));
     EXPECT_FALSE(trie.startsWith("abc"));
 }
+
+} // namespace
+} // namespace alg

@@ -2,58 +2,62 @@
 #include <gtest/gtest.h>
 #include <format>
 #include <functional>
+#include <ranges>
 #include "power_set.hpp"
+
+namespace alg {
+namespace {
 
 using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
-
-namespace {
+using ::testing::UnorderedElementsAreArray;
 
 using PowerSetFunc = std::function<std::vector<std::vector<int>>(std::vector<int>)>;
 
 const std::map<std::string, PowerSetFunc> powerSetFunctions = {
-    {"PowerSetIter", alg::powerSetIter<std::vector<int>>},
-    {"PowerSetRec", alg::powerSetDFS<std::vector<int>>},
-    {"PowerSetLib", alg::powerSetBacktrack<std::vector<int>>}
+    {"PowerSetIter", powerSetIter<std::vector<int>>},
+    {"PowerSetRec", powerSetDFS<std::vector<int>>},
+    {"PowerSetLib", powerSetBacktrack<std::vector<int>>}
 };
 
 struct TestPowerSetInput {
-    const std::vector<int> input;
-    const std::vector<std::vector<int>> expected;
+    std::vector<int> input;
+    std::vector<std::vector<int>> expected;
 };
 
 const std::map<std::string, TestPowerSetInput> testCases = {
-    {"EmptySet", 
-        {{}, {{}}
+    {"EmptySet", {
+        .input = {}, 
+        .expected = {{}}
     }},
-    {"SingleElement", 
-        {{1}, {{}, {1}}}
+    {"SingleElement", {
+        .input = {1}, 
+        .expected = {{}, {1}}}
     },
-    {"TwoElements", 
-        {{1, 2}, {{}, {1}, {2}, {1, 2}}}
+    {"TwoElements", {
+        .input = {1, 2}, 
+        .expected = {{}, {1}, {2}, {1, 2}}}
     },
-    {"ThreeElements", 
-        {{1, 2, 3}, 
-         {{}, {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3}, {1, 2, 3}}}
+    {"ThreeElements", {
+        .input = {1, 2, 3}, 
+        .expected = {{}, {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3}, {1, 2, 3}}}
     },
     // Testing with negative and positive numbers
-    {"MixedElements", 
-        {{-1, 2, -3}, 
-         {{}, {-1}, {2}, {-3}, {-1, 2}, {-1, -3}, {2, -3}, {-1, 2, -3}}}
+    {"MixedElements", {
+        .input = {-1, 2, -3}, 
+        .expected = {{}, {-1}, {2}, {-3}, {-1, 2}, {-1, -3}, {2, -3}, {-1, 2, -3}}}
     },
-    {"LargerSet", 
-        {{1, 2, 3, 4}, 
-         {{}, {1}, {2}, {3}, {4}, {1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, 
+    {"LargerSet", {
+        .input = {1, 2, 3, 4}, 
+        .expected = {{}, {1}, {2}, {3}, {4}, {1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, 
           {3, 4}, {1, 2, 3}, {1, 2, 4}, {1, 3, 4}, {2, 3, 4}, {1, 2, 3, 4}}}
     },
-    {"RangeOfElements", 
-        {{-2, 0, 2}, 
-         {{}, {-2}, {0}, {2}, {-2, 0}, {-2, 2}, {0, 2}, {-2, 0, 2}}}
+    {"RangeOfElements", {
+        .input = {-2, 0, 2}, 
+        .expected = {{}, {-2}, {0}, {2}, {-2, 0}, {-2, 2}, {0, 2}, {-2, 0, 2}}}
     }
 };
-
-} // namespace
 
 using PowerSetParamT = std::tuple<decltype(powerSetFunctions)::value_type, decltype(testCases)::value_type>;
 
@@ -67,11 +71,9 @@ TEST_P(PowerSetTest, TestPowerSet) {
     auto res = powerSetFunc(input);
 
     // Ignore the order of the elements in the comparison
-    for (auto& subset : expected)
-        std::sort(subset.begin(), subset.end());
-    for (auto& subset : res)
-        std::sort(subset.begin(), subset.end());
-    EXPECT_THAT(res, ::testing::UnorderedElementsAreArray(expected));
+    for (auto& subset : expected) std::ranges::sort(subset);
+    for (auto& subset : res) std::ranges::sort(subset);
+    EXPECT_THAT(res, UnorderedElementsAreArray(expected));
 }
 
 INSTANTIATE_TEST_SUITE_P(PowerSetTestsGenerator, PowerSetTest,
@@ -79,3 +81,6 @@ INSTANTIATE_TEST_SUITE_P(PowerSetTestsGenerator, PowerSetTest,
     [](const auto& info) { 
         return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });
+
+}  // namespace
+}  // namespace alg

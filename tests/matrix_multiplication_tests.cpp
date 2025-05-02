@@ -5,19 +5,20 @@
 #include <functional> 
 #include "matrix_multiplication.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
-
-namespace  {
 
 using Matrix = std::vector<std::vector<int>>;
 using MatMultFunc = std::function<void(const Matrix&, const Matrix&, Matrix&)>;
 
 const std::map<std::string, MatMultFunc> matMulFunctions = {
-    {"MatrixMultSchoolbook", alg::matrixMultiplication<Matrix>},
-    {"MatrixMultDivAndConq", alg::matrixMultDivConq<Matrix>},
-    {"MatrixMultStrassen", alg::matrixMultStrassen<Matrix>},
+    {"MatrixMultSchoolbook", matrixMultiplication<Matrix>},
+    {"MatrixMultDivAndConq", matrixMultDivConq<Matrix>},
+    {"MatrixMultStrassen", matrixMultStrassen<Matrix>},
 };
 
 const std::map<std::string, std::tuple<Matrix, Matrix, Matrix>> testMatrices = {
@@ -43,8 +44,6 @@ const std::map<std::string, std::tuple<Matrix, Matrix, Matrix>> testMatrices = {
     },
 };
 
-} // namespace
-
 using MatrixMultTestParamT = std::tuple<decltype(matMulFunctions)::value_type, decltype(testMatrices)::value_type>;
 
 class MatrixMultTest : public TestWithParam<MatrixMultTestParamT> {};
@@ -67,3 +66,6 @@ INSTANTIATE_TEST_SUITE_P(MatrixMultTestsGenerator, MatrixMultTest,
     [](const auto& info) { 
         return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });
+
+}  // namespace
+}  // namespace alg

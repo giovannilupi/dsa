@@ -4,22 +4,19 @@
 #include <numeric>
 #include "binary_tree.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::ValuesIn;
 
-namespace {
-
-using alg::TreeNode;
-
 const std::map<std::string, TreeNode<int>*> testTrees = {
     {"EmptyTree", nullptr},
-    {"OneElementTree", alg::toBinaryTree({12})},
-    {"TwoElementsTree", alg::toBinaryTree({10, 20})},
-    {"RepeatedElementsTree", alg::toBinaryTree({7, 7, 7, 7, 7})},
-    {"SimpleTree", alg::toBinaryTree({4, 2, 6, 1, 3, 5, 7})},
+    {"OneElementTree", toBinaryTree({12})},
+    {"TwoElementsTree", toBinaryTree({10, 20})},
+    {"RepeatedElementsTree", toBinaryTree({7, 7, 7, 7, 7})},
+    {"SimpleTree", toBinaryTree({4, 2, 6, 1, 3, 5, 7})},
 };
-
-} // namespace
 
 using BinTreeTestParamT = decltype(testTrees)::value_type;
 
@@ -71,9 +68,9 @@ TEST_P(BinTreeTest, CopyWorks) {
 TEST_P(BinTreeTest, EqualWorks) {
     TreeNode<int>* tree = GetParam().second;
     auto vec = toVector(tree);
-    EXPECT_TRUE(checkEqualTrees(tree, alg::toBinaryTree(vec)));
+    EXPECT_TRUE(checkEqualTrees(tree, toBinaryTree(vec)));
     vec.push_back(1);
-    EXPECT_FALSE(checkEqualTrees(tree, alg::toBinaryTree(vec)));
+    EXPECT_FALSE(checkEqualTrees(tree, toBinaryTree(vec)));
     EXPECT_TRUE(checkEqualTrees(tree, tree));
 }
 
@@ -156,11 +153,11 @@ TreeNode<int>* createDegenerateTree() {
 
 TEST(BinTreeTest, ToBinaryTreeWorks) {
     auto* expected = createSimpleTree();
-    auto* root = alg::toBinaryTree({4, 2, 6, 1, 3, 5, 7});
+    auto* root = toBinaryTree({4, 2, 6, 1, 3, 5, 7});
     EXPECT_TRUE(checkEqualTrees(root, expected));
     deleteTree(root);
     deleteTree(expected);
-    root = alg::toBinaryTree<int>({});
+    root = toBinaryTree<int>({});
     expected = nullptr;
     EXPECT_TRUE(checkEqualTrees(root, expected));
 }
@@ -196,8 +193,8 @@ TEST(BinTreeTest, HeightWorks) {
 }
 
 TEST(BinTreeTest, MirrorWorks) {
-    TreeNode<int>* original = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
-    TreeNode<int>* expected = alg::toBinaryTree({1, 3, 2, 7, 6, 5, 4});
+    TreeNode<int>* original = toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    TreeNode<int>* expected = toBinaryTree({1, 3, 2, 7, 6, 5, 4});
     mirrorTree(original);
     EXPECT_TRUE(checkEqualTrees(original, expected));
     deleteTree(original);
@@ -210,8 +207,8 @@ TEST(BinTreeTest, MirrorWorks) {
 }
 
 TEST(BinTreeTest, MirrorCheckWorks) {
-    TreeNode<int>* original = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
-    TreeNode<int>* expected = alg::toBinaryTree({1, 3, 2, 7, 6, 5, 4});
+    TreeNode<int>* original = toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    TreeNode<int>* expected = toBinaryTree({1, 3, 2, 7, 6, 5, 4});
     EXPECT_TRUE(checkMirrorTree(original, expected));
     deleteTree(original);
     deleteTree(expected);
@@ -220,8 +217,8 @@ TEST(BinTreeTest, MirrorCheckWorks) {
     expected = nullptr;
     EXPECT_TRUE(checkMirrorTree(original, expected));
     // Work with trees that are not mirrors
-    original = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
-    expected = alg::toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    original = toBinaryTree({1, 2, 3, 4, 5, 6, 7});
+    expected = toBinaryTree({1, 2, 3, 4, 5, 6, 7});
     EXPECT_FALSE(checkMirrorTree(original, expected));
     deleteTree(original);
     deleteTree(expected);
@@ -301,3 +298,6 @@ TEST(BinTreeTest, isHeightBalancedWorks) {
     EXPECT_TRUE(isHeightBalanced(notCompleteTree));
     deleteTree(notCompleteTree);
 }
+
+}  // namespace
+}  // namespace alg

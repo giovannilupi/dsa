@@ -2,21 +2,23 @@
 #include <format>
 #include "union_find.hpp"
 
-using alg::UnionFind;
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::Values;
 
 class UnionFindTest : public TestWithParam<int> {};
 
 TEST_P(UnionFindTest, InitializationWorks) {
-    int n = GetParam();
+    const int n = GetParam();
     UnionFind uf(n);
     // Each node should be its own parent initially
     for (int i = 0; i != n; ++i) EXPECT_EQ(uf.find(i), i);
 }
 
 TEST_P(UnionFindTest, UniteAndFindWork) {
-    int n = GetParam();
+    const int n = GetParam();
     UnionFind uf(n);
     // Progressive union of all elements
     for (int i = 0; i < n - 1; ++i) {
@@ -33,3 +35,6 @@ TEST_P(UnionFindTest, UniteAndFindWork) {
 INSTANTIATE_TEST_SUITE_P(UnionFindTestsGenerator, UnionFindTest, 
     Values(0, 1, 2, 5, 10, 100),
     [](const auto& info) { return std::format("Size_{}", std::to_string(info.param)); });
+
+}  // namespace
+}  // namespace alg

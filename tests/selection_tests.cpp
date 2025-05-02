@@ -5,60 +5,88 @@
 #include <regex>
 #include "selection.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
-
-namespace {
 
 using ExtremeValFunc = std::function<int(const std::vector<int>&)>;
 using MinMaxFunc = std::function<std::pair<int, int>(const std::vector<int>&)>;
 using SelectionFunc = std::function<int(std::vector<int>&, int)>;
 
 const std::map<std::string, ExtremeValFunc> extremeValFunctions = {
-    {"GetMin", alg::getMin<std::vector<int>>},
-    {"GetMax", alg::getMax<std::vector<int>>},
+    {"GetMin", getMin<std::vector<int>>},
+    {"GetMax", getMax<std::vector<int>>},
 };
 
 const std::map<std::string, MinMaxFunc> minMaxFunctions = {
-    {"GetMinMaxNaive", alg::getMinMax<std::vector<int>>},
-    {"GetMinMaxOptimal", alg::getMinMaxOpt<std::vector<int>>},
+    {"GetMinMaxNaive", getMinMax<std::vector<int>>},
+    {"GetMinMaxOptimal", getMinMaxOpt<std::vector<int>>},
 };
 
 const std::map<std::string, SelectionFunc> selectionFunctions = {
-    {"SelectMinNaive", alg::selectNthMin<std::vector<int>>},
-    {"SelectMaxNaice", alg::selectNthMax<std::vector<int>>},
-    {"QuickSelectMin", alg::quickSelectMin<std::vector<int>>},
-    {"QuickSelectMax", alg::quickSelectMax<std::vector<int>>},
-    {"HeapSelectMin", alg::heapSelectMin<std::vector<int>>},
-    {"HeapSelectMax", alg::heapSelectMax<std::vector<int>>},
-    {"SelectMinSTL", alg::selectMinModern<std::vector<int>>},
-    {"SelectMaxSTL", alg::selectMaxModern<std::vector<int>>},
+    {"SelectMinNaive", selectNthMin<std::vector<int>>},
+    {"SelectMaxNaice", selectNthMax<std::vector<int>>},
+    {"QuickSelectMin", quickSelectMin<std::vector<int>>},
+    {"QuickSelectMax", quickSelectMax<std::vector<int>>},
+    {"HeapSelectMin", heapSelectMin<std::vector<int>>},
+    {"HeapSelectMax", heapSelectMax<std::vector<int>>},
+    {"SelectMinSTL", selectMinModern<std::vector<int>>},
+    {"SelectMaxSTL", selectMaxModern<std::vector<int>>},
 };
 
 struct TestMinMaxInput {
-    const std::vector<int> input;
-    const int expectedMin;
-    const int expectedMax;
+    std::vector<int> input;
+    int expectedMin;
+    int expectedMax;
 };
 
 const std::map<std::string, TestMinMaxInput> testInputMinMax = {
-    {"SinglePositive", {{1}, 1, 1}},
-    {"SingleNegative", {{-1}, -1, -1}},
-    {"AllPositive", {{1, 2, 3, 4, 5}, 1, 5}},
-    {"AllNegative", {{-1, -2, -3, -4, -5}, -5, -1}},
-    {"AlternateSigns", {{-1, 2, -3, 4, -5}, -5, 4}},
-    {"Mixed", {{-1, 2, 3, -1, -2, -3, -4, -5}, -5, 3}},
-    {"PositiveNegative", {{10, 20, 30, 40, 50, -10, -20, -30}, -30, 50}},
-    {"NegativePositive", {{-10, -20, -30, -40, -50, 10, 20, 30}, -50, 30}},                                        
-    {"LongVector", {{1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49}, 1, 49}},  
+    {"SinglePositive", {
+        .input = {1}, 
+        .expectedMin = 1, 
+        .expectedMax = 1}},
+    {"SingleNegative", {
+        .input = {-1},
+        .expectedMin = -1,
+        .expectedMax = -1}},
+    {"AllPositive", {
+        .input = {1, 2, 3, 4, 5}, 
+        .expectedMin = 1, 
+        .expectedMax = 5}},
+    {"AllNegative", {
+        .input = {-1, -2, -3, -4, -5}, 
+        .expectedMin = -5,
+        .expectedMax = -1}},
+    {"AlternateSigns", {
+        .input = {-1, 2, -3, 4, -5},
+        .expectedMin = -5, 
+        .expectedMax = 4}},
+    {"Mixed", {
+        .input = {-1, 2, 3, -1, -2, -3, -4, -5},
+        .expectedMin = -5,
+        .expectedMax = 3}},
+    {"PositiveNegative", {
+        .input = {10, 20, 30, 40, 50, -10, -20, -30},
+        .expectedMin = -30, 
+        .expectedMax = 50}},
+    {"NegativePositive", {
+        .input = {-10, -20, -30, -40, -50, 10, 20, 30}, 
+        .expectedMin = -50, 
+        .expectedMax = 30}},                                        
+    {"LongVector", {
+        .input = {1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49},
+        .expectedMin = 1, 
+        .expectedMax = 49}},  
 };
 
 struct TestSelectionInput {
-    const std::vector<int> input;
-    const std::size_t k;
-    const int kth_min;
-    const int kth_max;
+    std::vector<int> input;
+    std::size_t k;
+    int kth_min;
+    int kth_max;
 };
 
 const std::map<std::string, TestSelectionInput> testInputSelection = {
@@ -75,8 +103,8 @@ const std::map<std::string, TestSelectionInput> testInputSelection = {
 };
 
 struct TestMedianInput {
-    const std::vector<int> input;
-    const double expected;
+    std::vector<int> input;
+    double expected;
 };
 
 const std::map<std::string, TestMedianInput> testInputMedian = {
@@ -95,8 +123,6 @@ const std::map<std::string, TestMedianInput> testInputMedian = {
     {"MultipleSameValues", { {1, 1, 1, 1, 1}, 1.0 }},
 };
 
-} // namespace
-
 using ExtremeValTestParamT = std::tuple<decltype(extremeValFunctions)::value_type, decltype(testInputMinMax)::value_type>;
 
 class ExtremeValueTest : public TestWithParam<ExtremeValTestParamT> {};
@@ -105,7 +131,7 @@ TEST_P(ExtremeValueTest, WorksWithAllInputs) {
     const auto& param = GetParam();
     const auto& [funcName, func] = std::get<0>(param);
     const auto& [input, expectedMin, expectedMax] = std::get<1>(param).second;
-    const auto& expected = std::regex_search(funcName, std::regex("Min"))
+    const int expected = std::regex_search(funcName, std::regex("Min"))
                             ? expectedMin
                             : expectedMax;
 
@@ -169,9 +195,12 @@ TEST_P(MedianTest, WorksWithAllInputs) {
     auto vec = testInput.input;
     const auto& expected = testInput.expected;
 
-    EXPECT_EQ(alg::getMedian(vec), expected);
+    EXPECT_EQ(getMedian(vec), expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(MedianTestsGenerator, MedianTest,
     ::testing::ValuesIn(testInputMedian),
     [](const auto& info) { return info.param.first; });
+
+}  // namespace
+}  // namespace alg

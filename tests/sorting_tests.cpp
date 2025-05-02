@@ -11,25 +11,26 @@
 #include "heapsort.hpp"
 #include "quicksort.hpp"
 
+namespace alg{
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-namespace {
-
 using SortFunc = std::function<void(std::vector<int>&)>;
 
 const std::map<std::string, SortFunc> sortingFunctions = {
-    {"InsertionSort", alg::insertionSort<std::vector<int>>},
-    {"InsertionSortModern", alg::insertionSortModern<std::vector<int>>},
-    {"SelectionSort", alg::selectionSort<std::vector<int>>},
-    {"BubbleSort", alg::bubbleSort<std::vector<int>>},
-    {"MergeSort", alg::mergeSort<std::vector<int>>},
-    {"MergeSortCoarse", alg::mergeSortCoarse<std::vector<int>>},
-    {"HeapSort", alg::heapSort<std::vector<int>>},
-    {"QuickSort", alg::quickSort<std::vector<int>>},
-    {"QuickSortRandom", alg::quickSortRandom<std::vector<int>>},
-    {"QuickSortCoarse", alg::quickSortCoarse<std::vector<int>>},
+    {"InsertionSort", insertionSort<std::vector<int>>},
+    {"InsertionSortModern", insertionSortModern<std::vector<int>>},
+    {"SelectionSort", selectionSort<std::vector<int>>},
+    {"BubbleSort", bubbleSort<std::vector<int>>},
+    {"MergeSort", mergeSort<std::vector<int>>},
+    {"MergeSortCoarse", mergeSortCoarse<std::vector<int>>},
+    {"HeapSort", heapSort<std::vector<int>>},
+    {"QuickSort", quickSort<std::vector<int>>},
+    {"QuickSortRandom", quickSortRandom<std::vector<int>>},
+    {"QuickSortCoarse", quickSortCoarse<std::vector<int>>},
 };
 
 const std::map<std::string, std::vector<int>> testVectors = {
@@ -42,8 +43,6 @@ const std::map<std::string, std::vector<int>> testVectors = {
     {"Duplicates", {4, 2, 5, 5, 3, 2, 1}},
     {"LargeValues", {2147483647, 2147483646, 2147483645, 2147483644, 2147483643, 2147483642, 2147483641}},
 };
-
-} // namespace
 
 using SortingTestParamT = std::tuple<decltype(sortingFunctions)::value_type, decltype(testVectors)::value_type>;
 
@@ -67,3 +66,6 @@ INSTANTIATE_TEST_SUITE_P(SortingTestsGenerator, SortingTest,
     [](const auto& info) {
         return std::format("{}_{}", std::get<0>(info.param).first, std::get<1>(info.param).first); 
     });
+
+}  // namespace
+}  // namespace alg

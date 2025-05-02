@@ -4,20 +4,19 @@
 #include <functional> 
 #include "fibonacci.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::ValuesIn;
-
-namespace {
 
 using FibFunc = std::function<uint64_t(uint64_t)>;
 
 const std::map<std::string, FibFunc> fibonacciFunctions = {
-    {"FibonacciRecursive", alg::fibRec},
-    {"FibonacciTailRecursive", alg::fibTailRec},
-    {"FibonacciIterative", alg::fibIter},
+    {"FibonacciRecursive", fibRec},
+    {"FibonacciTailRecursive", fibTailRec},
+    {"FibonacciIterative", fibIter},
 };
-
-} // namespace
 
 using FibTestParamT = decltype(fibonacciFunctions)::value_type;
 
@@ -52,3 +51,6 @@ TEST_P(FibonacciTest, WorksWithAllInputs) {
 INSTANTIATE_TEST_SUITE_P(FibonacciTestsGenerator, FibonacciTest, 
     ValuesIn(fibonacciFunctions),
     [](const auto& info) { return info.param.first; });
+
+}  // namespace
+}  // namespace alg

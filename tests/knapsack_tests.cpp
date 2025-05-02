@@ -5,26 +5,27 @@
 #include <functional> 
 #include "knapsack.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::Combine;
 using ::testing::ValuesIn;
 
-namespace {
-
 using KnapFunc = std::function<int(int, std::vector<int>, std::vector<int>)>;
 
 const std::map<std::string, KnapFunc> knapFunctions = {
-    {"KnapsackRecursive", alg::knapsackRec<std::vector<int>>},
-    {"KnapsackMemoized", alg::knapsackMemoized<std::vector<int>>},
-    {"KnapsackTabulated", alg::knapsackDP<std::vector<int>>},
-    {"KnapsackTabulatedOptimized", alg::knapsackDPOptimized<std::vector<int>>}
+    {"KnapsackRecursive", knapsackRec<std::vector<int>>},
+    {"KnapsackMemoized", knapsackMemoized<std::vector<int>>},
+    {"KnapsackTabulated", knapsackDP<std::vector<int>>},
+    {"KnapsackTabulatedOptimized", knapsackDPOptimized<std::vector<int>>}
 };
 
 struct TestKnapsackInput {
-    const int capacity;
-    const std::vector<int> weights;
-    const std::vector<int> values;
-    const int expected;
+    int capacity;
+    std::vector<int> weights;
+    std::vector<int> values;
+    int expected;
 };
 
 const std::map<std::string, TestKnapsackInput> testCases = {
@@ -37,10 +38,10 @@ const std::map<std::string, TestKnapsackInput> testCases = {
 };
 
 struct TestKnapsackFractInput {
-    const double capacity;
-    const std::vector<int> weights;
-    const std::vector<int> values;
-    const double expected;
+    double capacity;
+    std::vector<int> weights;
+    std::vector<int> values;
+    double expected;
 };
 
 const std::map<std::string, TestKnapsackFractInput> fracTestCases = {
@@ -62,8 +63,6 @@ const std::map<std::string, TestKnapsackInput> unboundedTestCases = {
     {"SimpleCase", {8, {1, 3, 4, 5}, {10, 40, 50, 70}, 110}},
     {"SimpleCase2", {10, {3, 4, 6, 8}, {15, 25, 20, 10}, 55}},
 };
-
-} // namespace
 
 using KnapTestParamT = std::tuple<decltype(knapFunctions)::value_type, decltype(testCases)::value_type>;
 
@@ -92,7 +91,7 @@ TEST_P(KnapsackFractionalTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
     const auto& [capacity, weights, values, expected] = GetParam().second;
 
-    EXPECT_EQ(alg::knapsackFractional(capacity, weights, values), expected);
+    EXPECT_EQ(knapsackFractional(capacity, weights, values), expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(KanpsackFractionalTestsGenerator, KnapsackFractionalTest,
@@ -107,9 +106,12 @@ TEST_P(KnapsackUnboundedTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
     const auto& [capacity, weights, values, expected] = GetParam().second;
 
-    EXPECT_EQ(alg::knapsackUnbounded(capacity, weights, values), expected);
+    EXPECT_EQ(knapsackUnbounded(capacity, weights, values), expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(KanpsackUnboundedTestsGenerator, KnapsackUnboundedTest,
     ValuesIn(unboundedTestCases),
     [](const auto& info) { return info.param.first; });
+
+}  // namespace
+}  // namespace alg

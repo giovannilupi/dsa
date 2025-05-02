@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
 #include "sudoku.hpp"
 
+namespace alg {
+namespace {
+
 using ::testing::TestWithParam;
 using ::testing::ValuesIn;
-
-namespace {
 
 using SudokuBoard = std::vector<std::vector<char>>;
 
@@ -87,8 +88,6 @@ const std::map<std::string, std::pair<SudokuBoard, bool>> testBoards = {
     }}
 };
 
-} // namespace
-
 using SudokuTestParamT = decltype(testBoards)::value_type;
 
 class SudokuTest : public TestWithParam<SudokuTestParamT> {};
@@ -97,9 +96,12 @@ TEST_P(SudokuTest, WorksWithAllInputs) {
     // Get the parameters for the current test case
     const auto& [board, expected] = GetParam().second;
     // Check if the board is valid
-    EXPECT_EQ(alg::isValidSudoku(board, '.'), expected);
+    EXPECT_EQ(isValidSudoku(board, '.'), expected);
 }
 
 INSTANTIATE_TEST_SUITE_P(SudokuTestsGenerator, SudokuTest,
     ValuesIn(testBoards),
     [](const auto& info) { return info.param.first; });
+
+}  // namespace alg
+}  // namespace tests
