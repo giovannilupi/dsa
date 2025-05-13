@@ -134,9 +134,19 @@ TreeNode<int>* createSimpleTree() {
     //      2   6
     //     / \ / \
     //    1  3 5  7
-    return new TreeNode<int>(4, 
-            new TreeNode<int>(2, new TreeNode<int>(1), new TreeNode<int>(3)),
-            new TreeNode<int>(6, new TreeNode<int>(5), new TreeNode<int>(7)));
+    return new TreeNode<int>{
+        .val = 4,
+        .left = new TreeNode<int>{
+            .val = 2,
+            .left = new TreeNode<int>{.val = 1},
+            .right = new TreeNode<int>{.val = 3}
+        },
+        .right = new TreeNode<int>{
+            .val = 6,
+            .left = new TreeNode<int>{.val = 5},
+            .right = new TreeNode<int>{.val = 7}
+        }
+    };
 }
 
 TreeNode<int>* createDegenerateTree() {
@@ -146,7 +156,15 @@ TreeNode<int>* createDegenerateTree() {
     //      2
     //     /
     //    1
-    return new TreeNode<int>(4, new TreeNode<int>(2, new TreeNode<int>(1), nullptr), nullptr);
+    return new TreeNode<int>{
+        .val = 4, 
+        .left = new TreeNode<int>{
+            .val = 2, 
+            .left = new TreeNode<int>{
+                .val = 1
+            }
+        }
+    };
 }
 
 } // namespace
@@ -181,7 +199,7 @@ TEST(BinTreeTest, ToVectorWorks) {
 TEST(BinTreeTest, HeightWorks) {
     TreeNode<int>* root = nullptr;
     EXPECT_EQ(getTreeHeight(root), 0);
-    root = new TreeNode<int>(1);
+    root = new TreeNode<int>{.val = 1};
     EXPECT_EQ(getTreeHeight(root), 1);
     delete root;
     root = createSimpleTree();
@@ -252,11 +270,11 @@ TEST(BinTreeTest, LowestCommonAncestorWorks) {
     //      1   2
     //     / \
     //    3  4 
-    TreeNode<int>* root = new TreeNode<int>(0);
-    TreeNode<int>* node1 = new TreeNode<int>(1);
-    TreeNode<int>* node2 = new TreeNode<int>(2);
-    TreeNode<int>* node3 = new TreeNode<int>(3);
-    TreeNode<int>* node4 = new TreeNode<int>(4);
+    TreeNode<int>* root = new TreeNode<int>{.val = 0};
+    TreeNode<int>* node1 = new TreeNode<int>{.val = 1};
+    TreeNode<int>* node2 = new TreeNode<int>{.val = 2};
+    TreeNode<int>* node3 = new TreeNode<int>{.val = 3};
+    TreeNode<int>* node4 = new TreeNode<int>{.val = 4};
     root->left = node1;
     root->right = node2;
     node1->left = node3;
@@ -288,13 +306,13 @@ TEST(BinTreeTest, isHeightBalancedWorks) {
     auto* completeTree = createSimpleTree();
     EXPECT_TRUE(isHeightBalanced(completeTree));
     // Make the tree not balanced
-    const auto* newRoot = new TreeNode<int>(0, completeTree, nullptr);
+    const auto* newRoot = new TreeNode<int>{.val = 0, .left = completeTree};
     EXPECT_FALSE(isHeightBalanced(newRoot));
     deleteTree(newRoot);
     auto* notCompleteTree = createDegenerateTree();
     EXPECT_FALSE(isHeightBalanced(notCompleteTree));
     // Diff 1 between subtrees
-    notCompleteTree->right = new TreeNode<int>(1);
+    notCompleteTree->right = new TreeNode<int>{.val = 1};
     EXPECT_TRUE(isHeightBalanced(notCompleteTree));
     deleteTree(notCompleteTree);
 }

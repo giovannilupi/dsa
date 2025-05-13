@@ -232,12 +232,12 @@ TEST(LCATest, LowestCommonAncestorWorks) {
     //     / \   \
     //    3   5   9
     // Create a binary search tree manually
-    TreeNode<int>* root = new TreeNode<int>(6);
-    TreeNode<int>* fourNode = root->left = new TreeNode<int>(4);
-    TreeNode<int>* eightNode = root->right = new TreeNode<int>(8);
-    TreeNode<int>* threeNode = fourNode->left = new TreeNode<int>(3);
-    TreeNode<int>* fiveNode = fourNode->right = new TreeNode<int>(5);
-    TreeNode<int>* nineNode = eightNode->right = new TreeNode<int>(9);
+    TreeNode<int>* root = new TreeNode<int>{.val = 6};
+    TreeNode<int>* fourNode = root->left = new TreeNode<int>{.val = 4};
+    TreeNode<int>* eightNode = root->right = new TreeNode<int>{.val = 8};
+    TreeNode<int>* threeNode = fourNode->left = new TreeNode<int>{.val = 3};
+    TreeNode<int>* fiveNode = fourNode->right = new TreeNode<int>{.val = 5};
+    TreeNode<int>* nineNode = eightNode->right = new TreeNode<int>{.val = 9};
 
     // LCA of 4 and 8 is 6
     const TreeNode<int>* lca = lcaBST(root, fourNode, eightNode); 

@@ -12,14 +12,13 @@ namespace alg {
 
 /*
  * Node of a binary tree.
+ * For built-in types, the `val` field must be initialized explicitly at construction.
  */
 template <typename T>
 struct TreeNode {
     T val;
-    TreeNode* left;
-    TreeNode* right;
-    TreeNode(const T& val) : val(val), left(nullptr), right(nullptr) {}
-    TreeNode(const T& val, TreeNode* left, TreeNode* right) : val(val), left(left), right(right) {}
+    TreeNode* left = nullptr;
+    TreeNode* right = nullptr;
 };
 
 namespace detail {
@@ -148,19 +147,19 @@ template <std::input_or_output_iterator Iter>
 TreeNode<typename std::iterator_traits<Iter>::value_type>* toBinaryTree(Iter first, Iter last) {
     using V = typename std::iterator_traits<Iter>::value_type;
     if (first == last) return nullptr;
-    TreeNode<V>* root = new TreeNode<V>(*first++);
+    TreeNode<V>* root = new TreeNode<V>{.val = *first++};
     std::queue<TreeNode<V>*> child_queue;
     child_queue.push(root);
-    auto it = first;
+    Iter it = first;
     while (!child_queue.empty() && it != last) {
         TreeNode<V>* node = child_queue.front();
         child_queue.pop();
         if (it != last) {
-            node->left = new TreeNode<V>(*it++);
+            node->left = new TreeNode<V>{.val = *it++};
             child_queue.push(node->left);
         }
         if (it != last) {
-            node->right = new TreeNode<V>(*it++);
+            node->right = new TreeNode<V>{.val = *it++};
             child_queue.push(node->right);
         }
     }
@@ -212,7 +211,7 @@ TreeNode<T>* copyTree(const TreeNode<T>* root) {
     if (!root) return nullptr;
     TreeNode<T>* left = copyTree(root->left);
     TreeNode<T>* right = copyTree(root->right);
-    return new TreeNode<T>(root->val, left, right);
+    return new TreeNode<T>{.val = root->val, .left = left, .right = right};
 }
 
 /**

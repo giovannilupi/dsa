@@ -68,7 +68,7 @@ bool checkBST(const TreeNode<T>* root) {
  */
 template <typename T>
 TreeNode<T>* insertBSTRec(TreeNode<T>* root, const T& val) {
-    if (!root) root = new TreeNode<T>(val);
+    if (!root) root = new TreeNode<T>{.val = val};
     if (root->val == val) return root;
     if (val < root->val) root->left = insertBSTRec(root->left, val);
     else root->right = insertBSTRec(root->right, val);
@@ -89,9 +89,9 @@ TreeNode<T>* insertBSTIter(TreeNode<T>* root, const T& val) {
         prev = curr;
         curr = (val < curr->val) ? curr->left : curr->right;
     }
-    if (!prev) return new TreeNode<T>(val);
-    if (val < prev->val) prev->left = new TreeNode<T>(val);
-    else prev->right = new TreeNode<T>(val);
+    if (!prev) return new TreeNode<T>{.val = val};
+    if (val < prev->val) prev->left = new TreeNode<T>{.val = val};
+    else prev->right = new TreeNode<T>{.val = val};
     return root;
 }
 
