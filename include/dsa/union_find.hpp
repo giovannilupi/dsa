@@ -43,8 +43,8 @@ public:
     void unite(int x, int y) {
         if (x < 0 || x >= parent.size()) throw std::out_of_range(std::format("Node {} is out of range", x));
         if (y < 0 || y >= parent.size()) throw std::out_of_range(std::format("Node {} is out of range", y));
-        int xRoot = find(x);
-        int yRoot = find(y);
+        const int xRoot = find(x);
+        const int yRoot = find(y);
         // Already in the same set
         if (xRoot == yRoot) return;
         // Attach the smaller tree to the larger tree

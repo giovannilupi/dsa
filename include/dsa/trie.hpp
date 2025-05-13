@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <unordered_map>
+#include <ranges>
 #include "common.hpp"
 
 namespace alg {
@@ -35,9 +36,9 @@ class Trie {
             // If the node has no children, it can be deleted
             return node->children.empty();
         }
-        char c = word[depth];
+        const char c = word[depth];
         if (!node->children.contains(c)) return false;
-        bool shouldDeleteChild = removeHelper(node->children[c], word, depth + 1);
+        const bool shouldDeleteChild = removeHelper(node->children[c], word, depth + 1);
         if (shouldDeleteChild) {
             delete node->children[c];
             node->children.erase(c);
@@ -51,7 +52,7 @@ class Trie {
      * Deletes the Trie recursively.
      */
     void deleteTrie(const TrieNode* node) {
-        for (const auto& [_, child] : node->children) {
+        for (const TrieNode* child : std::views::values(node->children)) {
             deleteTrie(child);
         }
         delete node;
@@ -71,7 +72,7 @@ public:
      */
     void insert(std::string_view word) {
         TrieNode* node = root;
-        for (char c : word) {
+        for (const char c : word) {
             if (!node->children.contains(c)) {
                 node->children[c] = new TrieNode();
             }
@@ -84,11 +85,11 @@ public:
      * Searches for a word in the Trie.
      * Returns true if the word exists, false otherwise.
      */
-    bool search(std::string_view word) {
-        TrieNode* node = root;
-        for (char c : word) {
+    bool search(std::string_view word) const {
+        const TrieNode* node = root;
+        for (const char c : word) {
             if (!node->children.contains(c)) return false;
-            node = node->children[c];
+            node = node->children.at(c);
         }
         return node->isEndOfWord;
     }
@@ -97,11 +98,11 @@ public:
      * Checks if the Trie contains a word that starts with the given prefix.
      * Returns true if the prefix exists, false otherwise.
      */
-    bool startsWith(std::string_view prefix) {
-        TrieNode* node = root;
-        for (char c : prefix) {
+    bool startsWith(std::string_view prefix) const {
+        const TrieNode* node = root;
+        for (const char c : prefix) {
             if (!node->children.contains(c)) return false;
-            node = node->children[c];
+            node = node->children.at(c);
         }
         return true;
     }
