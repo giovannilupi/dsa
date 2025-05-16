@@ -15,9 +15,7 @@ namespace alg {
 template <typename T>
 struct SListNode {
     T val;
-    SListNode* next;
-    SListNode(T val) : val(val), next(nullptr) {}
-    SListNode(T val, SListNode* next) : val(val), next(next) {}
+    SListNode* next = nullptr;
 };
 
 /**
@@ -43,7 +41,7 @@ SListNode<T>* copyList(const SListNode<T>* head) {
     SListNode<T>* newHead = nullptr;
     SListNode<T>* newTail = nullptr;
     while (head) {
-        SListNode<T>* newNode = new SListNode<T>(head->val);
+        SListNode<T>* newNode = new SListNode<T>{.val = head->val};
         if (!newHead) newHead = newNode;
         else newTail->next = newNode;
         newTail = newNode;
@@ -104,7 +102,7 @@ SListNode<T>* insertList(SListNode<T>* head, std::size_t pos, const T& val) {
         curr = curr->next;
     }
     // Insert the element
-    SListNode<T>* new_node = new SListNode<T>(val, curr);
+    SListNode<T>* new_node = new SListNode<T>{.val = val, .next = curr};
     // Handle empty list
     if (!prev) return new_node;
     prev->next = new_node;
@@ -211,7 +209,7 @@ SListNode<T>* toList(std::initializer_list<T> initList) {
     SListNode<T>* head = nullptr;
     SListNode<T>* tail = nullptr;
     for (const auto &val : initList) {
-        SListNode<T>* new_node = new SListNode<T>(val);
+        SListNode<T>* new_node = new SListNode<T>{.val = val};
         if (!head) head = new_node;
         if (tail) tail->next = new_node;
         tail = new_node;

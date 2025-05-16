@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <algorithm>
+#include <string_view>
+#include <ranges>
 #include <unordered_map>
 #include <map>
 #include <vector>
@@ -148,12 +150,12 @@ class ListTestFixture : public ::testing::Test {
 protected:
 
     void TearDown() override {
-        for (const auto& [_, list] : testLists) {
+        for (SListNode<int>* list : std::views::values(testLists)) {
             deleteList(list);
         }
     }
 
-    std::unordered_map<std::string, SListNode<int>*> testLists = {
+    std::unordered_map<std::string_view, SListNode<int>*> testLists = {
         {"EmptyList", nullptr},
         {"SingleElementList", toList({1})},
         {"SimpleList", toList({1, 2, 3, 4, 5})},
@@ -163,15 +165,15 @@ protected:
 private:
     /* List: 1 -> 2 -> 3 -> 4 -> 5 -> 3 */
     SListNode<int>* createCyclicList() {
-        SListNode<int>* head = new SListNode(1);
+        SListNode<int>* head = new SListNode<int>{.val = 1};
         SListNode<int>* tail = head;
-        tail->next = new SListNode(2);
+        tail->next = new SListNode<int>{.val = 2};
         tail = tail->next;
-        SListNode<int>* cycleEntry = tail->next = new SListNode(3);
+        SListNode<int>* cycleEntry = tail->next = new SListNode<int>{.val = 3};
         tail = tail->next;
-        tail->next = new SListNode(4);
+        tail->next = new SListNode<int>{.val = 4};
         tail = tail->next;
-        tail->next = new SListNode(5);
+        tail->next = new SListNode<int>{.val = 5};
         tail = tail->next;
         tail->next = cycleEntry;
         return head;
@@ -199,17 +201,17 @@ TEST_F(ListTestFixture, ToVector) {
 }
 
 TEST_F(ListTestFixture, ToList) {
-    auto* list = toList<int>({});
-    EXPECT_THAT(listToVector(list), ElementsAre());
-    deleteList(list);
+    SListNode<int>* emptyList = toList<int>({});
+    EXPECT_THAT(listToVector(emptyList), ElementsAre());
+    deleteList(emptyList);
 
-    list = toList({1});
-    EXPECT_THAT(listToVector(list), ElementsAre(1));
-    deleteList(list);
+    SListNode<int>* singleList = toList({1});
+    EXPECT_THAT(listToVector(singleList), ElementsAre(1));
+    deleteList(singleList);
 
-    list = toList({1, 2, 3, 4, 5});
-    EXPECT_THAT(listToVector(list), ElementsAre(1, 2, 3, 4, 5));
-    deleteList(list);
+    SListNode<int>* longList = toList({1, 2, 3, 4, 5});
+    EXPECT_THAT(listToVector(longList), ElementsAre(1, 2, 3, 4, 5));
+    deleteList(longList);
 }
 
 }  // namespace
